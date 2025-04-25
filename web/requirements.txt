@@ -1,0 +1,6 @@
+Django>=3.2,<4.0
+gunicorn
+psycopg2-binary
+requests==2.29.0
+pycryptodome
+python-dotenv
