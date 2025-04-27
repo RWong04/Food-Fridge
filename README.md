@@ -4,15 +4,35 @@
 - **Nginx**：反向代理，處理靜態檔案與流量分發
 - **Docker**：容器化專案，方便部署與維護
 
+## 快捷啟動和停止
+* 啟動前請先打開 Docker Desktop 應用程式，否則將無法啟動
+1. 啟動：
+```bash bash ./start.sh```
+
+2. 停止：
+```bash bash ./stop.sh```
+
+
 ## 簡單指令
 1. 首次啟動時，收集靜態檔案：
-python manage.py collectstatic
+```bash python manage.py collectstatic```
 
 2. 建立新 app：
-python manage.py startapp <app_name>
+```bash python manage.py startapp <app_name>```
 
 3. 執行資料庫遷移：
-docker-compose run web python manage.py migrate
+```bash docker-compose run web python manage.py migrate```
 
 4. 啟動服務：
-docker-compose up --build
+```bash docker-compose up --build```
+
+
+## 連線至資料庫
+- 目前由主機直接連線至資料庫還有一些問題，但可以透過 Docker 容器來連線
+```bash
+docker-compose exec db bash
+psql -U db_user -d fridge_db
+```
+
+## 資料庫查詢
+- 直接使用 SQL 語法則可查詢
