@@ -7,24 +7,24 @@
 ## 快捷啟動和停止
 * 啟動前請先打開 Docker Desktop 應用程式，否則將無法啟動
 1. 啟動：
-```bash bash ./start.sh```
+```bash ./start.sh```
 
 2. 停止：
-```bash bash ./stop.sh```
+```bash ./stop.sh```
 
 
 ## 簡單指令
 1. 首次啟動時，收集靜態檔案：
-```bash python manage.py collectstatic```
+```python manage.py collectstatic```
 
 2. 建立新 app：
-```bash python manage.py startapp <app_name>```
+```python manage.py startapp <app_name>```
 
 3. 執行資料庫遷移：
-```bash docker-compose run web python manage.py migrate```
+```docker-compose run web python manage.py migrate```
 
 4. 啟動服務：
-```bash docker-compose up --build```
+```docker-compose up --build```
 
 
 ## 連線至資料庫
