@@ -3,8 +3,8 @@ set -e  # 任何錯誤立即終止腳本
 
 # 定義常用變數
 COMPOSE_FILE="docker-compose.yml"  # 你的 compose 檔案路徑
-PROJECT_NAME="final_project"       # 專案名稱(需與 compose 的 container 前綴一致)
-VOLUMES=("final_project_postgres_data" "static_volume")  # 需要檢查的 volume 列表
+PROJECT_NAME="food_fridge"       # 專案名稱(需與 compose 的 container 前綴一致)
+VOLUMES=("postgres_data" "static_volume")  # 需要檢查的 volume 列表
 
 echo "=== 啟動剩食冰箱系統部署流程 ==="
 
@@ -61,10 +61,15 @@ echo "資料庫已就緒！"
 # 6. 執行資料庫遷移
 echo "執行 Django 資料庫遷移..."
 docker-compose -f ${COMPOSE_FILE} -p ${PROJECT_NAME} exec web python manage.py makemigrations
+
+echo "優先遷移自訂用戶模型 app..."
+docker-compose -f ${COMPOSE_FILE} -p ${PROJECT_NAME} exec web python manage.py migrate food_fridge
+
+echo "遷移所有 app..."
 docker-compose -f ${COMPOSE_FILE} -p ${PROJECT_NAME} exec web python manage.py migrate
 
 # 7. 收集靜態檔案（根據需要啟用）
-# echo "收集靜態檔案..."
-# docker-compose -f ${COMPOSE_FILE} -p ${PROJECT_NAME} exec web python manage.py collectstatic --noinput
+echo "收集靜態檔案..."
+docker-compose -f ${COMPOSE_FILE} -p ${PROJECT_NAME} exec web python manage.py collectstatic --noinput
 
-echo "=== 系統部署完成！訪問 http://localhost ==="
+echo "=== 系統部署完成！訪問 http://localhost:16701 ==="

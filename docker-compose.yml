@@ -9,7 +9,7 @@ services:
     ports:
       - "${DB_PORT}:5432"
     volumes:
-      - final_project_postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - app-network
 
@@ -43,6 +43,6 @@ networks:
 
 # 定義命名卷
 volumes:
-  final_project_postgres_data:
+  postgres_data:
     external: True
   static_volume:
