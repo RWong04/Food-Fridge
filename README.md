@@ -45,3 +45,5 @@ psql -U db_user -d fridge_db
     4. 搜尋剩食： search_food/
         - 還沒研究haversine的算法是不是公尺
     5. 查看單一剩食： check_food/
+## Changelog
+- 2025-05-05 [feature/login] 新增登入和註冊 API，支援 JSON 格式回應與錯誤碼
