@@ -38,8 +38,10 @@ psql -U db_user -d fridge_db
 - 直接使用 SQL 語法則可查詢
 
 ## 開發日誌
-- 新增api: 
-    1. 新增剩食：add_food/
+- 新增api（urls.py，實作在views.py）: 
+    1. 新增剩食： add_food/
     2. 更新剩食： update_food/
     3. 刪除剩食： delete_food/
-    4. 搜尋剩食：
+    4. 搜尋剩食： search_food/
+        - 還沒研究haversine的算法是不是公尺
+    5. 查看單一剩食： check_food/
