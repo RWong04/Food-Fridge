@@ -19,6 +19,9 @@ from food_fridge import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/foods', views.create_food),
-    path('api/foods/<int:food_id>', views.food_detail),
+    path('add_food/', views.add_food),
+    path('update_food/', views.update_food),
+    path('delete_food/', views.delete_food),
+    path('search_food/', views.search_food),
+    path('check_food/', views.check_food)
 ]
