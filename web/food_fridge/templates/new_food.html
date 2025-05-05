@@ -25,29 +25,12 @@
 
             <div class="form-group">
                 <label>商品種類</label>
-                <div class="relative max-w-sm">
-                    <button id="dropdownInformationButton" data-dropdown-toggle="dropdownInformation"
-                            class="bg-gray-50 border border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-100 p-2.5 text-left dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 inline-flex items-center justify-between"
-                            type="button">請選擇商品種類
-                        <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
-                        </svg>
-                    </button>
-                            <div id="dropdownInformation" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-full dark:bg-gray-700 dark:divide-gray-600">
-                                <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownInformationButton">
-                                    <li>
-                                        <a href="#" data-value="生食" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">生食</a>
-                                    </li>
-                                    <li>
-                                        <a href="#" data-value="熟食" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">熟食</a>
-                                    </li>
-                                    <li>
-                                        <a href="#" data-value="其他" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">其他</a>
-                                    </li>
-                                </ul>
-                            </div>
-                </div>
-                <input type="hidden" id="food-category" name="food_category">
+                <select id="food-category" name="food_category" class="bg-gray-50 border border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-100 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                    <option selected>請選擇商品種類</option>
+                    <option value="0">生食</option>
+                    <option value="1">熟食</option>
+                    <option value="2">其他</option>
+                </select>
             </div>
 
             <div class="form-group">
@@ -103,9 +86,6 @@
             const latitudeInput = document.getElementById('latitude');
             const longitudeInput = document.getElementById('longitude');
             const addressInput = document.getElementById('address');
-            const dropdownItems = document.querySelectorAll('#dropdownInformation a');
-            const categoryInput = document.getElementById('food-category');
-            const dropdownButton = document.getElementById('dropdownInformationButton');
             const geocoder = new google.maps.Geocoder(); // 創建 Geocoder 物件
 
             getLocationBtn.addEventListener('click', function() {
@@ -119,11 +99,11 @@
 
                                 latitudeInput.value = latitude;
                                 longitudeInput.value = longitude;
-                                
+
                                 /*測試傳到後端的參數
                                 alert('輸出項目：\n' +
                                       '商品名稱: ' + document.getElementById('food-name').value + '\n' +
-                                      '商品種類: ' + categoryInput.value + '\n' +
+                                      '商品種類: ' + document.getElementById('food-category').value + '\n' +
                                       '商品數量: ' + document.getElementById('quantity').value + '\n' +
                                       '有效日期: ' + document.getElementById('datepicker-actions').value + '\n' +
                                       '商品地址: ' + address + '\n' +
@@ -145,22 +125,39 @@
                     alert('請先輸入商品地址。');
                 }
             });
-
-            dropdownItems.forEach(item => {
-                item.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    const selectedCategory = this.getAttribute('data-value');
-                    categoryInput.value = selectedCategory;
-                    dropdownButton.textContent = selectedCategory;
-                    console.log('選取的商品種類:', selectedCategory);
-                    const dropdownMenu = document.getElementById('dropdownInformation');
-                    if (dropdownMenu && !dropdownMenu.classList.contains('hidden')) {
-                        dropdownMenu.classList.add('hidden');
-                        dropdownButton.setAttribute('aria-expanded', 'false');
-                    }
-                });
-            });
         }
+    </script>
+
+    <script>
+        document.getElementById("add-food-form").addEventListener("submit", function(event) {
+            event.preventDefault();  // 阻止默認表單提交行為
+    
+            // 準備表單資料
+            const formData = new FormData(this);
+    
+            // 使用 AJAX 提交表單資料
+            fetch("/add_food", {
+                method: "POST",
+                body: formData,
+            })
+            .then(response => response.json())  // 假設後端返回 JSON 資料
+            .then(data => {
+                if (data.success) {
+                    // 成功提交後清空表單欄位
+                    document.getElementById("add-food-form").reset();
+    
+                    // 可選: 顯示成功消息
+                    alert("表單已成功提交！");
+                } else {
+                    // 處理錯誤情況
+                    alert("提交失敗，請重試！");
+                }
+            })
+            .catch(error => {
+                // 錯誤處理
+                alert("發生錯誤，請稍後再試！");
+            });
+        });
     </script>
 
 
