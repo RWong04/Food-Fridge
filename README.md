@@ -39,5 +39,7 @@ psql -U db_user -d fridge_db
 
 ## 開發日誌
 - 新增api: 
-    1. 新增剩食：api/foods
-    2. 更新/刪除剩食：api/foods{food_id}（PATCH: update; DELETE: delete）
+    1. 新增剩食：add_food/
+    2. 更新剩食： update_food/
+    3. 刪除剩食： delete_food/
+    4. 搜尋剩食：
