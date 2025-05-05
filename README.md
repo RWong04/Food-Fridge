@@ -7,7 +7,7 @@
 ## 快捷啟動和停止
 * 啟動前請先打開 Docker Desktop 應用程式，否則將無法啟動
 1. 啟動：
-```bash ./start.sh```
+```bash ./deploy.sh```
 
 2. 停止：
 ```bash ./stop.sh```
@@ -36,3 +36,5 @@ psql -U db_user -d fridge_db
 
 ## 資料庫查詢
 - 直接使用 SQL 語法則可查詢
+
+## 開發日誌

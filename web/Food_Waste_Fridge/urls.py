@@ -15,7 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from food_fridge import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/foods', views.create_food),
+    path('api/foods/<int:food_id>', views.food_detail),
 ]
