@@ -1,0 +1,28 @@
+<h2>註冊</h2>
+<form id="register-form">
+  <input type="text" name="username" placeholder="Username" required>
+  <input type="email" name="email" placeholder="Email" required>
+  <input type="password" name="password1" placeholder="Password" required>
+  <input type="password" name="password2" placeholder="Repeat Password" required>
+  <button type="submit">註冊</button>
+</form>
+<div id="register-result"></div>
+
+<script>
+document.getElementById('register-form').onsubmit = async function(e) {
+    e.preventDefault();
+    const username = this.username.value;
+    const email = this.email.value;
+    const password1 = this.password1.value;
+    const password2 = this.password2.value;
+    const response = await fetch("{% url 'register' %}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({username, email, password1, password2})
+    });
+    const data = await response.json();
+    document.getElementById('register-result').innerText = JSON.stringify(data, null, 2);
+};
+</script>

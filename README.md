@@ -38,6 +38,5 @@ psql -U db_user -d fridge_db
 - 直接使用 SQL 語法則可查詢
 
 ## 開發日誌
-- 新增api: 
-    1. 新增剩食：api/foods
-    2. 更新/刪除剩食：api/foods{food_id}（PATCH: update; DELETE: delete）
+## Changelog
+- 2025-05-05 [feature/login] 新增登入和註冊 API，支援 JSON 格式回應與錯誤碼
