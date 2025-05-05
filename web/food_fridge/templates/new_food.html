@@ -1,0 +1,168 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'src/style.css' %}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAU_L5YBhN79HUbrStpMXFQOLHPEUfNCNo&callback=initMap" async defer></script>
+
+    <title>新增剩食</title>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">新增剩食</h1>
+
+        <form id="add-food-form" action="/add_food" method="POST">
+            <div class="form-group">
+                <label>商品名稱</label>
+                <div class="relative max-w-sm">
+                    <input type="text" id="food-name" name="food_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>商品種類</label>
+                <div class="relative max-w-sm">
+                    <button id="dropdownInformationButton" data-dropdown-toggle="dropdownInformation"
+                            class="bg-gray-50 border border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-100 p-2.5 text-left dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 inline-flex items-center justify-between"
+                            type="button">請選擇商品種類
+                        <svg class="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                        </svg>
+                    </button>
+                            <div id="dropdownInformation" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-full dark:bg-gray-700 dark:divide-gray-600">
+                                <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownInformationButton">
+                                    <li>
+                                        <a href="#" data-value="生食" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">生食</a>
+                                    </li>
+                                    <li>
+                                        <a href="#" data-value="熟食" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">熟食</a>
+                                    </li>
+                                    <li>
+                                        <a href="#" data-value="其他" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">其他</a>
+                                    </li>
+                                </ul>
+                            </div>
+                </div>
+                <input type="hidden" id="food-category" name="food_category">
+            </div>
+
+            <div class="form-group">
+                <label>商品數量</label>
+                <div class="relative max-w-sm">
+                    <input type="text" id="quantity" name="food_quantity" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>有效日期</label>
+                <div class="relative max-w-sm">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+                        </svg>
+                    </div>
+                    <input id="datepicker-actions" datepicker datepicker-buttons datepicker-autoselect-today type="text" name="food_expired_date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="選擇日期" required/>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <label>商品地址</label>
+                <div class="relative max-w-sm">
+                    <input type="text" id="address" name="food_address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+                </div>
+            </div>
+            <input type="hidden" id="latitude" name="latitude">
+            <input type="hidden" id="longitude" name="longitude">
+
+            <div class="form-group">
+                <label>商品描述</label>
+                <div class="relative max-w-sm">
+                    <textarea id="description" rows="4" name="food_description" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="請描述商品"></textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>實物照片</label>
+                <div class="relative max-w-sm">
+                    <input id="food-image" name="food_image" class="block w-full mb-5 text-xs text-gray-500 border border-gray-600 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-500 dark:border-gray-600 dark:placeholder-gray-400" id="image" type="file">
+                </div>
+            </div>
+            {% comment %} <button type="button" id="submitBtn">送出</button> {% endcomment %}
+            <button type="submit" id="submitBtn">送出</button>
+        </form>
+    </div>
+
+    <script>
+        function initMap() {
+            const getLocationBtn = document.getElementById('submitBtn');
+            const latitudeInput = document.getElementById('latitude');
+            const longitudeInput = document.getElementById('longitude');
+            const addressInput = document.getElementById('address');
+            const dropdownItems = document.querySelectorAll('#dropdownInformation a');
+            const categoryInput = document.getElementById('food-category');
+            const dropdownButton = document.getElementById('dropdownInformationButton');
+            const geocoder = new google.maps.Geocoder(); // 創建 Geocoder 物件
+
+            getLocationBtn.addEventListener('click', function() {
+                const address = addressInput.value;
+                if (address) {
+                    geocoder.geocode({ 'address': address }, function(results, status) {
+                        if (status === 'OK') {
+                            if (results[0]) {
+                                const latitude = results[0].geometry.location.lat();
+                                const longitude = results[0].geometry.location.lng();
+
+                                latitudeInput.value = latitude;
+                                longitudeInput.value = longitude;
+                                
+                                /*測試傳到後端的參數
+                                alert('輸出項目：\n' +
+                                      '商品名稱: ' + document.getElementById('food-name').value + '\n' +
+                                      '商品種類: ' + categoryInput.value + '\n' +
+                                      '商品數量: ' + document.getElementById('quantity').value + '\n' +
+                                      '有效日期: ' + document.getElementById('datepicker-actions').value + '\n' +
+                                      '商品地址: ' + address + '\n' +
+                                      '緯度: ' + latitude + '\n' +
+                                      '經度: ' + longitude + '\n' +
+                                      '商品描述: ' + document.getElementById('description').value + '\n' +
+                                      '商品照片: ' + document.getElementById('food-image').value + '\n' 
+                                    );
+                                */
+
+                            } else {
+                                alert('找不到該地址的座標。');
+                            }
+                        } else {
+                            alert('地址解析失敗，錯誤訊息：' + status);
+                        }
+                    });
+                } else {
+                    alert('請先輸入商品地址。');
+                }
+            });
+
+            dropdownItems.forEach(item => {
+                item.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    const selectedCategory = this.getAttribute('data-value');
+                    categoryInput.value = selectedCategory;
+                    dropdownButton.textContent = selectedCategory;
+                    console.log('選取的商品種類:', selectedCategory);
+                    const dropdownMenu = document.getElementById('dropdownInformation');
+                    if (dropdownMenu && !dropdownMenu.classList.contains('hidden')) {
+                        dropdownMenu.classList.add('hidden');
+                        dropdownButton.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            });
+        }
+    </script>
+
+
+    </body>
+</html>
