@@ -36,3 +36,8 @@ psql -U db_user -d fridge_db
 
 ## 資料庫查詢
 - 直接使用 SQL 語法則可查詢
+
+## 開發日誌
+- 新增api: 
+    1. 新增剩食：api/foods
+    2. 更新/刪除剩食：api/foods{food_id}（PATCH: update; DELETE: delete）
