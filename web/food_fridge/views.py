@@ -106,11 +106,8 @@ def search_food(request):
 
     # 取得 query string
     keyword       = request.GET.get('keyword', '')
-
-    # 不確定是要前端回傳值還是抓資料庫的
     user_lat      = request.GET.get('user_latitude') 
     user_lon      = request.GET.get('user_longitude')
-
     sort_distance = request.GET.get('sort_distance', 'false').lower() == 'true'
     sort_price    = request.GET.get('sort_price',    'false').lower() == 'true'
 
