@@ -22,6 +22,6 @@ urlpatterns = [
     path('add_food/', views.add_food),
     path('update_food/', views.update_food),
     path('delete_food/', views.delete_food),
-    path('search_food/', views.search_food),
+    path('search/', views.search),
     path('check_food/', views.check_food)
 ]

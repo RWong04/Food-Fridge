@@ -93,61 +93,49 @@ def delete_food(request, food_id):
 
 
 # --- 工具：計算兩座標直線距離（公里） ---
-def haversine(lat1, lon1, lat2, lon2):
-    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
-    dlon, dlat = lon2 - lon1, lat2 - lat1
-    a = sin(dlat/2)**2 + cos(lat1)*cos(lat2)*sin(dlon/2)**2
-    return 6371 * 2 * asin(sqrt(a))
+   
 
 # 搜尋剩食
-def search_food(request):
+@csrf_exempt
+def search(request):
     if request.method != 'GET':
         return JsonResponse({'success': False, 'error': 'Only GET allowed'}, status=405)
 
-    # 取得 query string
-    keyword       = request.GET.get('keyword', '')
-    user_lat      = request.GET.get('user_latitude') 
-    user_lon      = request.GET.get('user_longitude')
-    sort_distance = request.GET.get('sort_distance', 'false').lower() == 'true'
-    sort_price    = request.GET.get('sort_price',    'false').lower() == 'true'
-
-    # 關鍵字過濾
-    qs = Food.objects.filter(
-        Q(name__icontains=keyword) | Q(description__icontains=keyword)
+    # 從請求中獲取搜尋參數
+    keyword = request.GET.get('simple-search', '')
+    
+    # 根據關鍵字過濾
+    foods = Food.objects.filter(
+        Q(name__icontains = keyword) | Q(description__icontains = keyword)
     )
 
-    # 轉成 tuple list
     result = []
-    for f in qs:
-        distance = None
-        distance = haversine(float(user_lat), float(user_lon), f.latitude, f.longitude)
+    for food in foods:
+        # distance = None
+        # if user_lat and user_lon:
+        #     # 計算距離
+        #     distance = haversine(float(user_lat), float(user_lon), food.latitude, food.longitude)
         result.append((
-            f.pk, # food_id
-            f.name,
-            f.category,
-            f.description,
-            f.quantity,
-            f.unit,
-            f.price,
-            f.expiration_date.isoformat(),
-            f.latitude,
-            f.longitude,
-            f.is_soldout,
-            distance                
+            food.pk,               # food_id
+            food.name,
+            food.category,
+            food.description,
+            food.quantity,
+            food.unit,
+            food.price,
+            food.expiration_date.isoformat(),
+            food.latitude,
+            food.longitude,
+            food.is_soldout,
+            # distance                # 顯示距離
         ))
 
-    # 排序
-    if sort_price:
-        #sort by price
-        result.sort(key=lambda t: t[f.price])           
-    if sort_distance and user_lat and user_lon:
-        # sort by distance
-        result = [t for t in result if t[distance] is not None]
-        result.sort(key=lambda t: t[distance])          
+    
 
-    return JsonResponse(result, safe=False)       
+    return JsonResponse(result, safe=False)  # 回傳符合條件的剩食     
 
 # 查看單一剩食
+@csrf_exempt
 def check_food(request, food_id):
     if request.method == 'GET':
         try:
