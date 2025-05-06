@@ -133,6 +133,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = '/app/static/'
 
+# Disable APPEND_SLASH to prevent POST redirect issues
+APPEND_SLASH = False
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

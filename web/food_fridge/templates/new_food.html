@@ -15,7 +15,7 @@
     <div class="container">
         <h1 class="title">新增剩食</h1>
 
-        <form id="add-food-form" action="/add_food" method="POST">
+        <form id="add-food-form" action="/add_food/" method="POST">
             <div class="form-group">
                 <label>商品名稱</label>
                 <div class="relative max-w-sm">
@@ -48,7 +48,7 @@
                             <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
                         </svg>
                     </div>
-                    <input id="datepicker-actions" datepicker datepicker-buttons datepicker-autoselect-today type="text" name="food_expired_date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="選擇日期" required/>
+                    <input id="datepicker-actions" datepicker datepicker-format="yyyy-mm-dd" datepicker-buttons datepicker-autoselect-today type="text" name="food_expired_date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="YYYY-MM-DD" required/>
                 </div>
             </div>
 
@@ -135,8 +135,16 @@
             // 準備表單資料
             const formData = new FormData(this);
     
+            // 格式化日期為 YYYY-MM-DD
+            const dateInput = document.getElementById('datepicker-actions');
+            if (dateInput.value) {
+                const date = new Date(dateInput.value);
+                const formattedDate = date.toISOString().split('T')[0];
+                formData.set('food_expired_date', formattedDate);
+            }
+    
             // 使用 AJAX 提交表單資料
-            fetch("/add_food", {
+            fetch("/add_food/", {
                 method: "POST",
                 body: formData,
             })
