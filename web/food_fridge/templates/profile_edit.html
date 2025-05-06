@@ -1,0 +1,25 @@
+<form id="profile-form" enctype="multipart/form-data">
+    <input type="username" name="username" value="{{ user.username }}">
+    <input type="email" name="email" value="{{ user.email }}">
+    <input type="file" name="avatar">
+    <button type="submit">儲存</button>
+  </form>
+  <div id="profile-result"></div>
+  
+  <script>
+  document.getElementById('profile-form').onsubmit = async function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const response = await fetch("{% url 'profile_edit' %}", {  // Use the correct URL name
+          method: "POST",
+          body: formData
+      });
+      const data = await response.json();
+      if (response.status === 201 && data.redirect_url) {
+        window.location.href = data.redirect_url;  // 成功時重定向
+    } else {
+        document.getElementById('profile-result').innerText = JSON.stringify(data, null, 2);
+    }
+  };
+  </script>
+  

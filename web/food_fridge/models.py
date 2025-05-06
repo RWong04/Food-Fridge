@@ -17,6 +17,12 @@ class CustomUser(AbstractUser):
         related_name="customuser_permissions",  # 關鍵設定
         related_query_name="customuser",
     )
+    avatar = models.ImageField(
+        upload_to='avatars/',  # 上傳到 MEDIA_ROOT/avatars/
+        blank=True,
+        null=True,
+        verbose_name='大頭貼'
+    )
 
     def __str__(self):
         return self.username

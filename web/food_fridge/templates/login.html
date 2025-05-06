@@ -18,6 +18,10 @@ document.getElementById('login-form').onsubmit = async function(e) {
         body: JSON.stringify({username, password})
     });
     const data = await response.json();
-    document.getElementById('login-result').innerText = JSON.stringify(data, null, 2);
+    if (response.status === 201 && data.redirect_url) {
+        window.location.href = data.redirect_url;
+    } else {
+        document.getElementById('login-result').innerText = JSON.stringify(data, null, 2);
+    }
 };
 </script>
