@@ -1,0 +1,9 @@
+{% block content %}
+  <h2>個人資料</h2>
+  <p>帳號：{{ user.username }}</p>
+  <p>Email：{{ user.email }}</p>
+  {% if user.avatar %}
+    <img src="{{ user.avatar.url }}" alt="大頭貼" width="120">
+  {% endif %}
+  <p><a href="{% url 'profile_edit' %}">編輯個人資料</a></p>
+{% endblock %}

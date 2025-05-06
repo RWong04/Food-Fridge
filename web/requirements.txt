@@ -4,3 +4,4 @@ psycopg2-binary
 requests==2.29.0
 pycryptodome
 python-dotenv
+Pillow

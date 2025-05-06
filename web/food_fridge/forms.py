@@ -3,14 +3,16 @@ from django.contrib.auth.forms import UserCreationForm, UserChangeForm, Authenti
 from .models import CustomUser
 
 class CustomUserCreationForm(UserCreationForm):
+    avatar = forms.ImageField(required=False)
     class Meta:
         model = CustomUser
-        fields = ('username', 'email')  # 加入你想在註冊表單顯示的欄位
+        fields = ('username', 'email', 'avatar', 'password1', 'password2')
         
 class CustomUserChangeForm(UserChangeForm):
+    avatar = forms.ImageField(required=False)
     class Meta:
         model = CustomUser
-        fields = ('username', 'email')  # 可用於後續修改資料
+        fields = ('username', 'email', 'avatar')
 
 class LoginForm(AuthenticationForm):
     # 可自訂欄位（例如加上 Bootstrap 樣式）
