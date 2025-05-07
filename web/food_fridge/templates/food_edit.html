@@ -1,0 +1,26 @@
+{% block content %}
+<h2>編輯食物資訊</h2>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary">儲存修改</button>
+  <a href="{% url 'profile' %}" class="btn btn-secondary">返回個人頁</a>
+</form>
+
+{% if food.img_path %}
+  <h4>現有圖片：</h4>
+  <img src="{{ food.img_path }}" alt="{{ food.name }}" width="120">
+{% endif %}
+
+{% if form.errors %}
+  <div class="alert alert-danger" style="margin-top:1em;">
+    <ul>
+      {% for field, errors in form.errors.items %}
+        <li>{{ field }}: {{ errors|striptags }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+{% endblock %}

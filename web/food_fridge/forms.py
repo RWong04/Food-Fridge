@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, AuthenticationForm  
-from .models import CustomUser
+from .models import CustomUser, Food
 
 class CustomUserCreationForm(UserCreationForm):
     avatar = forms.ImageField(required=False)
@@ -22,3 +22,12 @@ class LoginForm(AuthenticationForm):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'form-control'})
     )
+
+
+class FoodForm(forms.ModelForm):
+    class Meta:
+        model = Food
+        fields = [
+            'name', 'category', 'description', 'quantity', 'unit',
+            'price', 'expiration_date', 'img_path', 'latitude', 'longitude', 'is_soldout'
+        ]
