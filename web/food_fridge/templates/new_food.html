@@ -82,13 +82,13 @@
 
     <script>
         function initMap() {
-            const getLocationBtn = document.getElementById('submitBtn');
             const latitudeInput = document.getElementById('latitude');
             const longitudeInput = document.getElementById('longitude');
             const addressInput = document.getElementById('address');
             const geocoder = new google.maps.Geocoder(); // 創建 Geocoder 物件
 
-            getLocationBtn.addEventListener('click', function() {
+            // 當地址輸入框失去焦點時獲取經緯度
+            addressInput.addEventListener('blur', function() {
                 const address = addressInput.value;
                 if (address) {
                     geocoder.geocode({ 'address': address }, function(results, status) {
@@ -99,8 +99,6 @@
 
                                 latitudeInput.value = latitude;
                                 longitudeInput.value = longitude;
-
-                                
                             } else {
                                 alert('找不到該地址的座標。');
                             }
@@ -108,8 +106,6 @@
                             alert('地址解析失敗，錯誤訊息：' + status);
                         }
                     });
-                } else {
-                    alert('請先輸入商品地址。');
                 }
             });
         }
