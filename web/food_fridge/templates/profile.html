@@ -7,3 +7,28 @@
   {% endif %}
   <p><a href="{% url 'profile_edit' %}">編輯個人資料</a></p>
 {% endblock %}
+
+<h3>我的食物列表</h3>
+{% if foods %}
+  <ul>
+    {% for food in foods %}
+      <li>
+        <strong>{{ food.name }}</strong>（{{ food.quantity }}{{ food.unit }}）
+        - 分類：{{ food.get_category_display }}
+        - 價格：{{ food.price }}
+        - 到期日：{{ food.expiration_date }}
+        {% if food.is_soldout %}<span style="color:red;">（已售出）</span>{% endif %}
+        {% if food.img_path %}
+          <img src="{{ food.img_path }}" alt="{{ food.name }}" width="80">
+        {% endif %}
+        <br>
+        {{ food.description }}
+        <a href="{% url 'food_edit' food.pk %}">
+          <button type="button">編輯</button>
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>你目前沒有上架任何食物。</p>
+{% endif %}

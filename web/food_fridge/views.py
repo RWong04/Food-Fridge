@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
+from .models import Food
 import json
 
 @csrf_exempt
@@ -64,7 +65,8 @@ def login_view(request):
 @login_required
 def profile_view(request):
     user = request.user
-    return render(request, 'profile.html', {'user': user})
+    foods = user.foods.all()
+    return render(request, 'profile.html', {'user': user, 'foods': foods})
 
 @csrf_exempt
 @login_required
@@ -82,3 +84,16 @@ def profile_edit_view(request):
     else:
         form = CustomUserChangeForm(instance=user)
     return render(request, 'profile_edit.html', {'form': form})
+
+@csrf_exempt
+@login_required
+def food_edit_view(request, pk):
+    food = get_object_or_404(Food, pk=pk, user=request.user)
+    if request.method == 'POST':
+        form = FoodForm(request.POST, instance=food)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+    else:
+        form = FoodForm(instance=food)
+    return render(request, 'food_edit.html', {'form': form, 'food': food})
