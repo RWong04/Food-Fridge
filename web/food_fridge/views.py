@@ -1,47 +1,50 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.template import loader
-from django.http import JsonResponse
+from django.shortcuts            import render
+from django.http                 import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import Food
-from django.db.models import Q
+from django.db.models            import Q
+from .models                     import Food
+import logging
 
-
+logger = logging.getLogger(__name__)
 
 @csrf_exempt
 def search(request):
-    if request.method == 'GET':
+    keyword = request.GET.get('simple-search')
+    # 如果前端帶了 simple-search，就當成 API 回 JSON
+    if keyword is not None:
+        try:
+            foods = Food.objects.filter(
+                Q(name__icontains=keyword) |
+                Q(description__icontains=keyword)
+            )
+            result = [{
+                'id':          f.pk,
+                'name':        f.name,
+                'category':    f.category,
+                'description': f.description,
+                'quantity':    f.quantity,
+                'unit':        f.unit,
+                'price':       f.price,
+                'expiration':  f.expiration_date.isoformat(),
+                'latitude':    f.latitude,
+                'longitude':   f.longitude,
+                'is_soldout':  f.is_soldout,
+            } for f in foods]
+            return JsonResponse(result, safe=False)
+        except Exception as e:
+            # 記錄錯誤，並回傳 500 + 錯誤訊息
+            logger.exception("搜尋 API 執行失敗")
+            return JsonResponse(
+                {'error': '搜尋發生錯誤，請稍後再試。'},
+                status=500
+            )
 
-        # 從請求中獲取搜尋參數
-        keyword = request.GET.get('simple-search', '')
-        
-        # 根據關鍵字過濾
-        foods = Food.objects.filter(
-            Q(name__icontains = keyword) | Q(description__icontains = keyword)
+    # 沒帶參數就回地圖頁面
+    try:
+        return render(request, 'map.html')
+    except Exception as e:
+        logger.exception("地圖頁面渲染失敗")
+        return HttpResponse(
+            "無法顯示地圖，請稍後再試。",
+            status=500
         )
-
-        result = []
-        for food in foods:
-            # distance = None
-            # if user_lat and user_lon:
-            #     # 計算距離
-            #     distance = haversine(float(user_lat), float(user_lon), food.latitude, food.longitude)
-            result.append((
-                food.pk,               # food_id
-                food.name,
-                food.category,
-                food.description,
-                food.quantity,
-                food.unit,
-                food.price,
-                food.expiration_date.isoformat(),
-                food.latitude,
-                food.longitude,
-                food.is_soldout,
-                # distance                # 顯示距離
-            ))
-
-        
-
-        return JsonResponse(result, safe=False)  # 回傳符合條件的剩食     
-    return render(request, 'map.html')
