@@ -68,6 +68,7 @@ def add_food(request):
                     expiration_date=food_expiration_date,
                     latitude=float(latitude),
                     longitude=float(longitude),
+                    food_address=food_address,  # 添加地址
                     unit='條',
                     price=0
                 )
