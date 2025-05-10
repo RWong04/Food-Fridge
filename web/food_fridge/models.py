@@ -41,6 +41,7 @@ class Food(models.Model):
     img_path = models.CharField(max_length=255, blank=True, null=True)
     latitude = models.FloatField()
     longitude = models.FloatField()
+    food_address = models.CharField(max_length=255, blank=True)  # 新增地址欄位
     is_soldout = models.BooleanField(default=False)
 
     def __str__(self):

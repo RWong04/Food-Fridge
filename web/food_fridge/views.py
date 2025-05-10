@@ -25,6 +25,7 @@ def search(request):
                 'quantity':    f.quantity,
                 'unit':        f.unit,
                 'price':       f.price,
+                'food_address':f.food_address,
                 'expiration':  f.expiration_date.isoformat(),
                 'latitude':    f.latitude,
                 'longitude':   f.longitude,
