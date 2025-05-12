@@ -1,10 +1,17 @@
+{% extends "base.html" %}
+{% block title %}登入{% endblock %}
+{% block navbar_title%}登入{%endblock%}
+{% block content %}
 <form id="login-form">
   <input type="text" name="username" placeholder="Username" required>
   <input type="password" name="password" placeholder="Password" required>
   <button type="submit">登入</button>
 </form>
 <div id="login-result"></div>
+{% csrf_token %}
+{% endblock %}
 
+{% block script %}
 <script>
 document.getElementById('login-form').onsubmit = async function(e) {
     e.preventDefault();
@@ -25,3 +32,4 @@ document.getElementById('login-form').onsubmit = async function(e) {
     }
 };
 </script>
+{% endblock %}
