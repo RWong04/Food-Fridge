@@ -18,19 +18,16 @@ def search_api(request):
         search_term = request.GET.get('simple-search', None)
 
         if search_term:
-            # 使用 Q 物件進行模糊搜尋，同時搜尋 name, description 和 food_address
             foods = Food.objects.filter(
                 Q(name__icontains=search_term) |
                 Q(description__icontains=search_term)
             )
         else:
-            # 如果沒有提供搜尋詞，可以回傳所有食物或一個空的列表，取決於你的需求
-            foods = Food.objects.all()  # 回傳所有食物
-            # foods = [] # 回傳空列表
+            foods = Food.objects.all()
 
         result = [{
             'id': f.pk,
-            'user': str(f.user),  # 將 User 物件轉換為字串
+            'user': str(f.user),
             'name': f.name,
             'category': f.category,
             'description': f.description,
