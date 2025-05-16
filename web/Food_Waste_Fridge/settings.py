@@ -132,6 +132,11 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = '/app/static/'
+# STATIC_ROOT = BASE_DIR / 'staticfiles'
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'static',  # 指向 food_fridge 的 static 文件夾
+#     BASE_DIR / 'food_fridge' / 'static'/ 'src',  # 指向 food_fridge 的 static 文件夾
+# ]
 
 
 # Default primary key field type
