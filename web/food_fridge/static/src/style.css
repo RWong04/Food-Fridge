@@ -1,5 +1,8 @@
 @import "tailwindcss";
-@source "../node_modules/flowbite-datepicker";
+@import "flowbite/src/themes/default";
+@import url(//fonts.googleapis.com/earlyaccess/notosanstc.css);
+@plugin "flowbite/plugin";
+@source "node_modules/flowbite";
 
 html,
 body {

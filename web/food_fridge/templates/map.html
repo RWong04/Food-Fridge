@@ -44,22 +44,18 @@
         </script>
 
         <script>
-            //  获取 form 元素
             const searchForm = document.getElementById('search-food-form');
-            //  获取 input 元素
             const searchInput = document.getElementById('simple-search');
-            //  获取显示结果的元素 (例如，scroll-window)
             const infoWindow = document.getElementById("info-window");
             const scrollWindow = document.querySelector(".scroll-window");
     
-            //  添加事件监听器来处理 form 的提交
+            //  add event listener to the form
             searchForm.addEventListener('submit', function(event) {
-                event.preventDefault();  //  阻止默认的 form 提交行为
+                event.preventDefault();
     
-                const searchTerm = searchInput.value;  //  获取搜索词
-                alert(`Searching for: ${searchTerm}`);  //  可选：显示搜索词
+                const searchTerm = searchInput.value;  // get keyword from input
+                //alert(`Searching for: ${searchTerm}`);
     
-                //  使用 fetch API 调用 search_api
                 fetch(`/api/search/?simple-search=${encodeURIComponent(searchTerm)}`)
                     .then(response => {
                         if (!response.ok) {
@@ -68,7 +64,7 @@
                         return response.json();
                     })
                     .then(data => {
-                        //  处理返回的食物数据 (data)
+                        //  show info window
                         displaySearchResults(data);
                     })
                     .catch(error => {
@@ -78,14 +74,11 @@
             });
     
             function displaySearchResults(results) {
-                //  首先，清除之前的搜索结果
+                // show the info window
+                infoWindow.style.display = "block";
+                //  clear previous results
                 while (scrollWindow.firstChild) {
                     scrollWindow.removeChild(scrollWindow.firstChild);
-                }
-    
-                if (results.length === 0) {
-                    scrollWindow.textContent = "No results found.";
-                    return;
                 }
     
                 var cardCount = results.length;
@@ -116,9 +109,7 @@
                 });
                 infoWindow.style.display = "block";
             }
-       </script>
 
-       <script>
         // To initialize the map--------------------------------------------------------------//
            var map = L.map('map', {zoomControl: false}).setView([23.773, 120.959], 8);
 
