@@ -8,70 +8,43 @@ import logging
 logger = logging.getLogger(__name__)
 
 @csrf_exempt
-def search(request):
-    keyword = request.GET.get('simple-search')
-    
-    # 當 keyword 為 None 或者諏問 /all-foods/ 路徑時，返回所有食物資訊
-    if keyword is None or request.path == '/all-foods/':
-        try:
-            foods = Food.objects.all()
-            result = [{
-                'id':          f.pk,
-                'user':        f.user,
-                'name':        f.name,
-                'category':    f.category,
-                'description': f.description,
-                'quantity':    f.quantity,
-                'unit':        f.unit,
-                'price':       f.price,
-                'food_address':f.food_address,
-                'expiration':  f.expiration_date.isoformat(),
-                'latitude':    f.latitude,
-                'longitude':   f.longitude,
-                'is_soldout':  f.is_soldout,
-            } for f in foods]
-            # 如果是 API 諏問，返回 JSON
-            if request.path == '/all-foods/' or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-                return JsonResponse(result, safe=False)
-            # 否則渲染頁面
-            return render(request, 'map.html')
-        except Exception as e:
-            logger.exception("獲取所有食物 API 執行失敗")
-            return JsonResponse(
-                {'error': '獲取食物資訊發生錯誤，請稍後再試。'},
-                status=500
-            )
-    
-    # 如果前端帶了 simple-search，就當成 API 回 JSON
-    try:
-        # 當 keyword 為空字串時，返回所有剩食
-        if keyword.strip() == '':
-            foods = Food.objects.all()
-        else:
+def search_page(request):
+    # 回傳地圖 HTML 頁面
+    return render(request, 'map.html')
+
+@csrf_exempt
+def search_api(request):
+    if request.method == 'GET':
+        search_term = request.GET.get('simple-search', None)
+
+        if search_term:
+            # 使用 Q 物件進行模糊搜尋，同時搜尋 name, description 和 food_address
             foods = Food.objects.filter(
-                Q(name__icontains=keyword) |
-                Q(description__icontains=keyword)
+                Q(name__icontains=search_term) |
+                Q(description__icontains=search_term)
             )
+        else:
+            # 如果沒有提供搜尋詞，可以回傳所有食物或一個空的列表，取決於你的需求
+            foods = Food.objects.all()  # 回傳所有食物
+            # foods = [] # 回傳空列表
+
         result = [{
-            'id':          f.pk,
-            'user':        f.user,
-            'name':        f.name,
-            'category':    f.category,
+            'id': f.pk,
+            'user': str(f.user),  # 將 User 物件轉換為字串
+            'name': f.name,
+            'category': f.category,
             'description': f.description,
-            'quantity':    f.quantity,
-            'unit':        f.unit,
-            'price':       f.price,
-            'food_address':f.food_address,
-            'expiration':  f.expiration_date.isoformat(),
-            'latitude':    f.latitude,
-            'longitude':   f.longitude,
-            'is_soldout':  f.is_soldout,
+            'quantity': f.quantity,
+            'unit': f.unit,
+            'price': f.price,
+            'food_address': f.food_address,
+            'expiration': f.expiration_date.isoformat() if f.expiration_date else None,
+            'latitude': float(f.latitude) if f.latitude is not None else None, # 確保是 float
+            'longitude': float(f.longitude) if f.longitude is not None else None, # 確保是 float
+            'is_soldout': f.is_soldout,
         } for f in foods]
+
         return JsonResponse(result, safe=False)
-    except Exception as e:
-        # 記錄錯誤，並回傳 500 + 錯誤訊息
-        logger.exception("搜尋 API 執行失敗")
-        return JsonResponse(
-            {'error': '搜尋發生錯誤，請稍後再試。'},
-            status=500
-        )
+    else:
+        return HttpResponse(status=405, reason='Method Not Allowed')
+
