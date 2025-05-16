@@ -57,3 +57,4 @@ class RecipeIngredientAdmin(admin.ModelAdmin):
     list_display = ('recipe', 'ingredient', 'quantity', 'unit')
     #raw_id_fields = ('recipe', 'ingredient')
     list_filter = ('recipe',)
+    
