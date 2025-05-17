@@ -78,6 +78,16 @@ textarea {
     text-align: left; 
 }
 
+#unit {
+    min-width: 200px; 
+    text-align: left; 
+}
+
+#price {
+    min-width: 200px; 
+    text-align: left; 
+}
+
 #datepicker-actions {
     min-width: 200px; 
     max-width: 200px;

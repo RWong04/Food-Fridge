@@ -19,6 +19,8 @@ def add_food(request):
             food_name = request.POST.get('food_name')
             food_category = request.POST.get('food_category')
             food_quantity = request.POST.get('food_quantity')
+            food_unit = request.POST.get('food_unit')
+            food_price = request.POST.get('food_price')
             food_expiration_date = request.POST.get('food_expired_date')
             food_address = request.POST.get('food_address')
             latitude = request.POST.get('latitude')
@@ -28,13 +30,15 @@ def add_food(request):
 
             # 記錄接收到的數據
             logger.info(f"Received data: name={food_name}, category={food_category}, quantity={food_quantity}, "
+                       f"unit={food_unit}, price={food_price}, "
                        f"expiration_date={food_expiration_date}, address={food_address}, "
                        f"latitude={latitude}, longitude={longitude}, description={food_description}, "
                        f"image={food_image.name if food_image else None}")
 
             # 校驗必填項
             required_fields = {'food_name': food_name, 'food_category': food_category, 
-                              'food_quantity': food_quantity, 'food_expired_date': food_expiration_date,
+                              'food_quantity': food_quantity, 'food_unit': food_unit, 'food_price': food_price,
+                              'food_expired_date': food_expiration_date,
                               'food_address': food_address, 'latitude': latitude, 'longitude': longitude}
             
             missing_fields = [field for field, value in required_fields.items() if not value]
@@ -73,13 +77,13 @@ def add_food(request):
                     category=int(food_category),
                     description=food_description,
                     quantity=quantity,
+                    unit =food_unit,
+                    price=float(food_price),
                     expiration_date=food_expiration_date,
                     img_path=food_image,  # 如果沒有上傳圖片，這裡會是None
                     latitude=lat,
                     longitude=lng,
-                    food_address=food_address,
-                    unit='條',  # 默認單位
-                    price=0  # 默認價格
+                    food_address=food_address
                 )
                 
                 logger.info(f"Successfully created food item with ID: {food.pk}")
