@@ -1,1 +1,5 @@
 .vscode
+**/media/
+**/migrations/
+**/staticfiles/
+**/__pycache__/
