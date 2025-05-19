@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>新增食譜</title>
+    </head>
+    <body>
+        <div class="container">
+            <h1 class="title">新增食譜</h1>
+            <form id="addRecipeForm" action="/add_recipe/" method="POST">
+                <div class="form-group">
+                    <label>食譜名稱</label>
+                    <div>
+                        <input type="text"
+                            id="recipe_name"
+                            name="recipe_name"
+                            required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>食譜描述</label>
+                    <div>
+                        <textarea id="recipe_description"
+                            rows="4"
+                            name="recipe_description"
+                            placeholder="請描述商品"
+                        >
+                        </textarea>
+                    </div>
+                </div>
+                <button type="submit" id="submitBtn">送出</button>
+            </form>
+        </div>
+
+        <script>
+            document
+                .getElementById("addRecipeForm").addEventListener("submit", async(event) => {
+                    event.preventDefault();  // 阻止默認表單提交行為
+            
+                    const form = event.target;
+                    const formData = new FormData(form);
+                    
+                    try {
+                    const response = await fetch( "/add_recipe/", {
+                    method: "POST",
+                    body: formData,
+                    });
+
+                    const data = await response.json();
+                    if (response.ok) {
+                        if (data.success) {
+                            document.getElementById("add-food-form").reset();
+        
+                            // 顯示成功消息
+                            alert("表單已成功提交！");
+                        }
+                        else {
+                            // 處理錯誤情況
+                            alert("提交失敗，請重試！");
+                        }
+                    } else {
+                        console.error("提交交過程發生錯誤:", data.error);
+                        alert("發生錯誤，請查看控制台了解錯誤訊息");
+                    }
+                } catch (error) {
+                    console.error("提交過程發生錯誤:", error);
+                    alert("發生錯誤，請查看控制台了解詳細資訊");
+                }
+            });
+
+        </script>
+
+    </body>
+</html>
