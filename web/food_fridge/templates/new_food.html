@@ -1,17 +1,13 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="zh-Hant">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'src/style.css' %}">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAU_L5YBhN79HUbrStpMXFQOLHPEUfNCNo&callback=initMap&loading=async" async defer></script>
+{% extends 'base.html' %}
+{% block title %}新增剩食{% endblock %}
 
-    <title>新增剩食</title>
-</head>
-<body>
+{% block script %}
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAU_L5YBhN79HUbrStpMXFQOLHPEUfNCNo&callback=initMap&loading=async" async defer></script>
+{% endblock %}
+
+{% block navbar_title %}新增剩食{% endblock %}
+
+{% block content %}
     <div class="container">
         <h1 class="title">新增剩食</h1>
 
@@ -93,7 +89,7 @@
             <button type="submit" id="submitBtn">送出</button>
         </form>
     </div>
-
+    
     <script>
         function initMap() {
             const latitudeInput = document.getElementById('latitude');
@@ -166,5 +162,4 @@
     </script>
 
 
-    </body>
-</html>
+{% endblock %}
