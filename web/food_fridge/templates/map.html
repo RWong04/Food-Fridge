@@ -2,6 +2,27 @@
 {% block title %}以地圖顯示{% endblock %}
 {% block navbar_title %}搜尋{% endblock %}
 {% block content %}
+<style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  
+    main {
+      height: 100vh;
+      position: relative;
+    }
+  
+    #map {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100%;
+      z-index: 1;
+    }
+  </style>
 
     <form class="flex items-center max-w-sm mx-auto" id="search-food-form" action="/api/search/" method="GET">   
         <div class="relative w-full">
