@@ -97,3 +97,4 @@ def food_edit_view(request, pk):
     else:
         form = FoodForm(instance=food)
     return render(request, 'food_edit.html', {'form': form, 'food': food})
+
