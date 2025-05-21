@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'food_fridge',
+    'compressor',
 ]
 
 MIDDLEWARE = [
@@ -61,7 +62,7 @@ ROOT_URLCONF = 'Food_Waste_Fridge.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'food_fridge','templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -94,24 +95,10 @@ DATABASES = {
 }
 AUTH_USER_MODEL = 'food_fridge.CustomUser'
 
-# Password validation
-# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
-
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:16701",
+    "http://127.0.0.1:16701",
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
@@ -131,15 +118,30 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/app/static/'
-# STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR / 'static'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',  # 指向 food_fridge 的 static 文件夾s
+]
+
+# STATIC_URL = '/static/'
+# STATIC_ROOT =  '/app/static'
 # STATICFILES_DIRS = [
-#     BASE_DIR / 'static',  # 指向 food_fridge 的 static 文件夾
-#     BASE_DIR / 'food_fridge' / 'static'/ 'src',  # 指向 food_fridge 的 static 文件夾
+#     BASE_DIR / 'static',
+#     BASE_DIR / 'food_fridge' / 'static',
 # ]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+COMPRESS_ROOT = BASE_DIR / 'static'
+
+
+COMPRESS_ENABLED = True
+
+STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)

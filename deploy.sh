@@ -4,7 +4,7 @@ set -e  # 任何錯誤立即終止腳本
 # 定義常用變數
 COMPOSE_FILE="docker-compose.yml"  # 你的 compose 檔案路徑
 PROJECT_NAME="food_fridge"       # 專案名稱(需與 compose 的 container 前綴一致)
-VOLUMES=("postgres_data" "static_volume")  # 需要檢查的 volume 列表
+VOLUMES=("postgres_data")  # 需要檢查的 volume 列表
 
 echo "=== 啟動剩食冰箱系統部署流程 ==="
 
