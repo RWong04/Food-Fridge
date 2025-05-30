@@ -1,11 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CustomUserCreationForm, CustomUserChangeForm, FoodForm
-from django.http import JsonResponse
+from django.http                 import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from .models import Food
 import json
+from django.db.models            import Q
+import logging
+
+logger = logging.getLogger(__name__)
 
 @csrf_exempt
 def register_view(request):
@@ -97,4 +101,44 @@ def food_edit_view(request, pk):
     else:
         form = FoodForm(instance=food)
     return render(request, 'food_edit.html', {'form': form, 'food': food})
+
+
+
+@csrf_exempt
+def search_page(request):
+    # 回傳地圖 HTML 頁面
+    return render(request, 'map.html')
+
+@csrf_exempt
+def search_api(request):
+    if request.method == 'GET':
+        search_term = request.GET.get('simple-search', None)
+
+        if search_term:
+            foods = Food.objects.filter(
+                Q(name__icontains=search_term) |
+                Q(description__icontains=search_term)
+            )
+        else:
+            foods = Food.objects.all()
+
+        result = [{
+            'id': f.pk,
+            'user': str(f.user),
+            'name': f.name,
+            'category': f.category,
+            'description': f.description,
+            'quantity': f.quantity,
+            'unit': f.unit,
+            'price': f.price,
+            'food_address': f.food_address,
+            'expiration': f.expiration_date.isoformat() if f.expiration_date else None,
+            'latitude': float(f.latitude) if f.latitude is not None else None, # 確保是 float
+            'longitude': float(f.longitude) if f.longitude is not None else None, # 確保是 float
+            'is_soldout': f.is_soldout,
+        } for f in foods]
+
+        return JsonResponse(result, safe=False)
+    else:
+        return HttpResponse(status=405, reason='Method Not Allowed')
 

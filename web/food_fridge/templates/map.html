@@ -1,8 +1,16 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'src/map.css' %}">
+{% endblock %}
+
 {% block title %}以地圖顯示{% endblock %}
 {% block navbar_title %}搜尋{% endblock %}
+{% block main_class %}h-screen overflow-hidden{% endblock %}
 {% block content %}
 
+<div class="map-container">
     <form class="flex items-center max-w-sm mx-auto" id="search-food-form" action="/api/search/" method="GET">   
         <div class="relative w-full">
             <input type="text" id="simple-search" name="simple-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="搜尋剩食" required />
@@ -13,23 +21,22 @@
             </svg>
             <span class="sr-only">Search</span>
         </button>
-        
     </form>
 
     <div id="info-window" class="info-window" >
         <button class="close-btn" onclick="closeInfoWindow()">×</button>
         <div class="scroll-window"></div>
-        
     </div>
 
     <div class="detail-window">
         <button class="close-btn" onclick="closeDetailWindow()">×</button>
-        
     </div>
 
     <div id="map"></div>
+    
+    {% csrf_token %}
+</div>
 
-{% csrf_token %}
 {% endblock %}
 
 {% block script %}

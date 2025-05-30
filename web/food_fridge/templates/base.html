@@ -11,6 +11,12 @@
     
     <link rel="stylesheet" href="{% static 'src/output.css' %}">
     
+    <!-- Leaflet CSS for map pages -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    {% block extra_css %}{% endblock %}
+    
     <title>{% block title %}My Site{% endblock %}</title>
 </head>
 <body>
@@ -20,7 +26,7 @@
             <!-- 還是這裡要放什麼剩食冰箱的logo? -->
         </div>
     </nav>
-    <main>
+    <main class="{% block main_class %}{% endblock %}">
         {% block content %}{% endblock %}
     </main>
     <footer class="fixed bottom-0 left-0 z-20 w-full p-4 bg-gray-200 border-t border-gray-200 rounded-4xl shadow-up-xl">
