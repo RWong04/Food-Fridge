@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'food_fridge',
-    'compressor',
+    # 'compressor',
 ]
 
 MIDDLEWARE = [
@@ -120,7 +120,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',  # 指向 food_fridge 的 static 文件夾s
+    BASE_DIR / 'static',
+    BASE_DIR / 'food_fridge' / 'static',
 ]
 
 MEDIA_URL = '/media/'
@@ -137,5 +138,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    'compressor.finders.CompressorFinder',
+    # 'compressor.finders.CompressorFinder',
 )
+
+# Django Compressor settings
+COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = False
+COMPRESS_CSS_FILTERS = [
+    'compressor.filters.css_default.CssAbsoluteFilter',
+    'compressor.filters.cssmin.rCSSMinFilter',
+]
+COMPRESS_JS_FILTERS = [
+    'compressor.filters.jsmin.JSMinFilter',
+]

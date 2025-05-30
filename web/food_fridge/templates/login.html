@@ -3,21 +3,27 @@
 {% block navbar_title %}登入{% endblock %}
 {% block content %}
 
+<div class="min-h-screen flex items-center justify-center px-4 pb-20">
+    <form class="w-full max-w-sm mx-auto" id="login-form" method="POST">
+        <div class="mb-5">
+            <label for="username" class="block mb-2 text-sm font-medium text-gray-900" name="username">帳號</label>
+            <input type="text" name="username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
+        </div>
+        <div class="mb-5">
+            <label for="password" class="block mb-2 text-sm font-medium text-gray-900">密碼</label>
+            <input type="password" name="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
+        </div>
+        <button type="submit" class="text-white bg-red-300 hover:bg-red-400 focus:ring-4 focus:outline-none focus:ring-red-400 font-medium rounded-lg text-sm w-full px-5 py-2.5 text-center">登入</button>
+        
+        <div class="mt-5 flex justify-center text-sm">
+            還沒有帳號？<a href="/app/register/" class="text-red-400 ml-1">點我註冊</a>
+        </div>
+        
+        <div id="login-result" class="mt-4 text-sm text-red-600"></div>
+        {% csrf_token %}
+    </form>
+</div>
 
-<form class="max-w-sm mx-auto m-[20]" id="login-form" method="POST">
-  <div class="mb-5">
-    <label for="username" class="block mb-2 text-sm font-medium text-gray-900" name="username">帳號</label>
-    <input type="text" name="username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
-  </div>
-  <div class="mb-5">
-    <label for="password" class="block mb-2 text-sm font-medium text-gray-900">密碼</label>
-    <input type="password" name="password" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
-  </div>
-  <button type="submit" class="text-white bg-red-300 hover:bg-red-400 focus:ring-4 focus:outline-none focus:ring-red-400 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">登入</button>
-</form>
-<div class="mt-5 flex justify-center">還沒有帳號？<a href="/app/register/" class="text-red-400">點我註冊</a></div>
-<div id="login-result"></div>
-{% csrf_token %}
 {% endblock %}
 
 {% block script %}
@@ -26,13 +32,17 @@ document.getElementById('login-form').onsubmit = async function(e) {
     e.preventDefault();
     const username = this.username.value;
     const password = this.password.value;
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
     const response = await fetch("{% url 'login' %}", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken
         },
         body: JSON.stringify({username, password})
     });
+    
     const data = await response.json();
     if (response.status === 201 && data.redirect_url) {
         window.location.href = data.redirect_url;
