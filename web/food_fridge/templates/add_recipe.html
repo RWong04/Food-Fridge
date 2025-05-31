@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'src/newrecipe.css' %}">
+{% endblock %}
+
+{% block title %}新增食譜{% endblock %}
+
+{% block navbar_title %}新增食譜{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <form id="addRecipeForm" action="/add_recipe/" method="POST">
+            <div class="form-group">
+                <label>食譜名稱</label>
+                <div class="relative max-w-sm">
+                    <input type="text" id="recipe-name" name="recipe_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>食譜描述</label>
+                <div class="relative max-w-sm">
+                    <textarea id="description"
+                        rows="4"
+                        name="recipe_description" 
+                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        placeholder="請描述食譜">
+                    </textarea>
+                </div>
+            </div>
+            <button type="submit" id="submitBtn">送出</button>
+        </form>
+    </div>
+{% endblock %}
+
+{% block script %}
+<script>
+    document
+        .getElementById("addRecipeForm").addEventListener("submit", async(event) => {
+            event.preventDefault();  // 阻止默認表單提交行為
+    
+            const form = event.target;
+            const formData = new FormData(form);
+            
+            try {
+            const response = await fetch( "/add_recipe/", {
+            method: "POST",
+            body: formData,
+            });
+
+            const data = await response.json();
+            if (response.ok) {
+                if (data.success) {
+                    document.getElementById("addRecipeForm").reset();
+
+                    // 顯示成功消息
+                    alert("表單已成功提交！");
+                }
+                else {
+                    // 處理錯誤情況
+                    alert("提交失敗，請重試！");
+                }
+            } else {
+                console.error("提交交過程發生錯誤:", data.error);
+                alert("發生錯誤，請查看控制台了解錯誤訊息");
+            }
+        } catch (error) {
+            console.error("提交過程發生錯誤:", error);
+            alert("發生錯誤，請查看控制台了解詳細資訊");
+        }
+    });
+</script>
+{% endblock %}

@@ -8,6 +8,7 @@ from .models import Food
 import json
 from django.db.models            import Q
 import logging
+from .models import Recipe, CustomUser
 
 logger = logging.getLogger(__name__)
 
@@ -141,4 +142,149 @@ def search_api(request):
         return JsonResponse(result, safe=False)
     else:
         return HttpResponse(status=405, reason='Method Not Allowed')
+    
+@csrf_exempt
+def add_food(request):
+    if request.method == 'POST':
+        try:
+            # 獲取表單資料
+            food_name = request.POST.get('food_name')
+            food_category = request.POST.get('food_category')
+            food_quantity = request.POST.get('food_quantity')
+            food_unit = request.POST.get('food_unit')
+            food_price = request.POST.get('food_price')
+            food_expiration_date = request.POST.get('food_expired_date')
+            food_address = request.POST.get('food_address')
+            latitude = request.POST.get('latitude')
+            longitude = request.POST.get('longitude')
+            food_description = request.POST.get('food_description', '')
+            food_image = request.FILES.get('food_image')
 
+            # 記錄接收到的數據
+            logger.info(f"Received data: name={food_name}, category={food_category}, quantity={food_quantity}, "
+                       f"unit={food_unit}, price={food_price}, "
+                       f"expiration_date={food_expiration_date}, address={food_address}, "
+                       f"latitude={latitude}, longitude={longitude}, description={food_description}, "
+                       f"image={food_image.name if food_image else None}")
+
+            # 校驗必填項
+            required_fields = {'food_name': food_name, 'food_category': food_category, 
+                              'food_quantity': food_quantity, 'food_unit': food_unit, 'food_price': food_price,
+                              'food_expired_date': food_expiration_date,
+                              'food_address': food_address, 'latitude': latitude, 'longitude': longitude}
+            
+            missing_fields = [field for field, value in required_fields.items() if not value]
+            if missing_fields:
+                error_msg = f"Missing required fields: {', '.join(missing_fields)}"
+                logger.error(error_msg)
+                return JsonResponse({'success': False, 'error': error_msg}, status=400)
+
+            # 將日期轉換成日期格式
+            try:
+                food_expiration_date = datetime.strptime(food_expiration_date, '%Y-%m-%d').date()
+            except ValueError as e:
+                logger.error(f"Invalid date format: {food_expiration_date}")
+                return JsonResponse({'success': False, 'error': 'Invalid date format'}, status=400)
+
+            # 創建食物記錄
+            try:
+                # 暫時使用第一個用戶作為發布者
+                user = CustomUser.objects.first()
+                if not user:
+                    logger.error("No user found in database")
+                    return JsonResponse({'success': False, 'error': 'No user found'}, status=500)
+
+                # 處理數值轉換
+                try:
+                    quantity = float(food_quantity)
+                    lat = float(latitude) if latitude else 0
+                    lng = float(longitude) if longitude else 0
+                except ValueError:
+                    return JsonResponse({'success': False, 'error': 'Invalid numeric values'}, status=400)
+
+                # 創建食物記錄
+                food = Food.objects.create(
+                    user=user,
+                    name=food_name,
+                    category=int(food_category),
+                    description=food_description,
+                    quantity=quantity,
+                    unit =food_unit,
+                    price=float(food_price),
+                    expiration_date=food_expiration_date,
+                    img_path=food_image,  # 如果沒有上傳圖片，這裡會是None
+                    latitude=lat,
+                    longitude=lng,
+                    food_address=food_address
+                )
+                
+                logger.info(f"Successfully created food item with ID: {food.pk}")
+                return JsonResponse({'success': True, 'food_id': food.id}, status=201)
+            except Exception as e:
+                logger.error(f"Error creating food item: {str(e)}")
+                return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+        except Exception as e:
+            logger.error(f"Unexpected error in add_food: {str(e)}")
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+    return render(request, 'new_food.html')
+
+@csrf_exempt
+def add_recipe(request):
+    """
+    新增食譜 API: 接收 POST 請求，新增一筆食譜資料到資料庫。
+
+    請求方式：
+        POST
+
+    請求參數(form-data):
+        - recipe_name: 食譜名稱（必填）
+        - recipe_description: 食譜描述（選填）
+
+    回應格式(JSON):
+        成功：
+            {
+                "success": true,
+                "recipe_id": <新食譜ID>
+            }
+        失敗：
+            {
+                "success": false,
+                "error": <錯誤訊息>
+            }
+
+    Status Code 說明：
+        - 201: 建立成功
+        - 400: 請求參數錯誤(如缺少名稱或找不到用戶)
+        - 500: 伺服器內部錯誤
+    """
+
+    if request.method == 'POST':
+        try:
+            # 獲取表單資料
+            name = request.POST.get('recipe_name')
+            description = request.POST.get('recipe_description')
+            # 因為 models.py 已有 auto_now_add=True，所以不用輸入
+            if not name:
+                return JsonResponse({'success': False, 'error': 'Recipe name id required'}, status=400)
+
+            # 暫時使用第一個用戶作為發布者
+            user = CustomUser.objects.first()
+            if not user:
+                return JsonResponse({'success': False, 'error': 'No user found'}, status=400)
+
+
+            # 把食譜加到資料庫
+            recipe = Recipe.objects.create(
+                user=user,
+                name=name,
+                description=description,
+            )
+                
+            return JsonResponse({'success': True, 'recipe_id': recipe.id}, status=201)
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+
+    return render(request, 'add_recipe.html')

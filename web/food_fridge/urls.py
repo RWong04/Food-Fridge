@@ -10,5 +10,7 @@ urlpatterns = [
     path('profile/', views.profile_view, name='profile'),
     path('food/<int:pk>/edit/', views.food_edit_view, name='food_edit'),
     path('map/', views.search_page, name='search_page'),       # 地圖頁面
-    path('api/search/', views.search_api, name='search_api')     # 搜尋 API
+    path('api/search/', views.search_api, name='search_api'),     # 搜尋 API
+    path('add_food/', views.add_food),
+    path('add_recipe/', views.add_recipe, name='addRecipe'),
 ]
