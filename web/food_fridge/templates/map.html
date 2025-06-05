@@ -2,33 +2,34 @@
 {% block title %}以地圖顯示{% endblock %}
 {% block navbar_title %}搜尋{% endblock %}
 {% block content %}
-<style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
-  
-    main {
-      height: 100vh;
-      position: relative;
-    }
-  
-    #map {
-      position: absolute;
-      top: 0;
-      left: 0;
-      height: 100vh;
-      width: 100%;
-      z-index: 1;
-    }
-  </style>
+    {% comment %} <style>
+        html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        }
+    
+        main {
+        height: 100%;
+        }
+        position: relative;
+        }
+    
+        #map {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        z-index: 1;
+        }
+    </style> {% endcomment %}
 
     <form class="flex items-center max-w-sm mx-auto" id="search-food-form" action="/api/search/" method="GET">   
         <div class="relative w-full">
-            <input type="text" id="simple-search" name="simple-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="搜尋剩食" required />
+            <input type="text" id="simple-search" name="simple-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5" placeholder="搜尋剩食" required />
         </div>
-        <button type="submit" class="p-2.5 ms-2 text-sm font-medium text-white bg-red-300 rounded-lg border bg-red-300 hover:bg-red-400 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-red-200 dark:hover:bg-red-400 dark:focus:ring-blue-800">
+        <button type="submit" class="p-2.5 ms-2 text-sm font-medium text-white bg-red-300 rounded-lg border bg-red-300 hover:bg-red-400 focus:ring-4 focus:outline-none focus:ring-blue-300">
             <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
             </svg>
@@ -197,15 +198,15 @@
                     var card = document.createElement("div");
                     card.classList.add("info-content");
                     card.innerHTML = `
-                        <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">${item.name}</h5>
-                            <p class="text-base text-gray-900 dark:text-gray-400">${item.description}</p>
-                            <p class="text-sm text-gray-700 dark:text-gray-400">價格: $${item.price}</p>
-                            <p class="text-sm text-gray-700 dark:text-gray-400">有效日期: ${new Date(item.expiration).toLocaleDateString()}</p>
-                            <p class="text-sm text-gray-700 dark:text-gray-400">地址: ${item.food_address}</p>
+                        <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-xl shadow-sm ">
+                            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 ">${item.name}</h5>
+                            <p class="text-base text-gray-900">${item.description}</p>
+                            <p class="text-sm text-gray-700">價格: $${item.price}</p>
+                            <p class="text-sm text-gray-700">有效日期: ${new Date(item.expiration).toLocaleDateString()}</p>
+                            <p class="text-sm text-gray-700">地址: ${item.food_address}</p>
                             <div style="display: flex; justify-content: flex-end;">
                                 <button 
-                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-300 rounded-lg hover:bg-red-300 focus:ring-4 focus:outline-none focus:bg-red-300 dark:bg-red-300 dark:hover:bg-red-300 dark:focus:bg-red-300"
+                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-300 rounded-lg hover:bg-red-300 focus:ring-4 focus:outline-none focus:bg-red-300"
                                     onclick="showDetailInfo(this)"
                                     data-food-user="${item.user}"
                                     data-food-id="${item.id}"
@@ -258,17 +259,17 @@
         
             detailWindow.innerHTML = '';
             detailWindow.innerHTML = `
-                <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">${food.name}</h5>
-                    <p class="text-base text-gray-900 dark:text-gray-400">${food.description}</p>
-                    <p class="text-sm text-gray-700 dark:text-gray-400">數量: ${food.quantity} ${food.unit}</p>
-                    <p class="text-sm text-gray-700 dark:text-gray-400">價格: $${food.price}</p>
-                    <p class="text-sm text-gray-700 dark:text-gray-400">有效日期: ${food.expiration}</p>
-                    <p class="text-sm text-gray-700 dark:text-gray-400">地址: ${food.food_address}</p>
-                    <p class="text-sm text-gray-700 dark:text-gray-400">賣家: ${food.user}</p>
+                <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-xl shadow-sm">
+                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">${food.name}</h5>
+                    <p class="text-base text-gray-900">${food.description}</p>
+                    <p class="text-sm text-gray-700">數量: ${food.quantity} ${food.unit}</p>
+                    <p class="text-sm text-gray-700">價格: $${food.price}</p>
+                    <p class="text-sm text-gray-700">有效日期: ${food.expiration}</p>
+                    <p class="text-sm text-gray-700">地址: ${food.food_address}</p>
+                    <p class="text-sm text-gray-700">賣家: ${food.user}</p>
                     <button class="close-btn" onclick="closeDetailWindow()">×</button>
                     <div style="display: flex; justify-content: center; margin-top: 20px;">
-                        <button id="contactBtn" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-300 rounded-lg hover:bg-red-300 focus:ring-4 focus:outline-none focus:bg-red-300 dark:bg-red-300 dark:hover:bg-red-300 dark:focus:bg-red-300">
+                        <button id="contactBtn" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-300 rounded-lg hover:bg-red-300 focus:ring-4 focus:outline-none focus:bg-red-300">
                             聯絡賣家
                         </button>
                     </div>
