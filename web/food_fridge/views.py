@@ -1,4 +1,4 @@
-from django.shortcuts            import render
+from django.shortcuts            import render, get_object_or_404
 from django.http                 import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models            import Q
@@ -79,3 +79,14 @@ def search_recipe(request):
         return HttpResponse(status=405, reason='Method Not Allowed')
     
     return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+def recipe_detail(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    ingredients = RecipeIngredient.objects.filter(recipe=recipe)
+    
+    context = {
+        'recipe': recipe,
+        'ingredients': ingredients,
+    }
+    
+    return render(request, 'recipe_detail.html', context)

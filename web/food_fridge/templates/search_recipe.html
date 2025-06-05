@@ -25,7 +25,7 @@
 <div class="list-container">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 content-start" id="recipe-list">
         {% for recipe in recipes %}
-        <div class="max-w-sm w-full p-6 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
+        <div class="max-w-sm p-6 mx-4 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
             <h2 class="text-xl font-bold mb-2">{{ recipe.name }}</h2>
             <div class="mb-4">
                 <h3 class="font-semibold mb-2">食材：</h3>
@@ -37,7 +37,12 @@
             </div>
             <div class="text-sm text-gray-500">
                 <p>作者：{{ recipe.user }}</p>
-                <p>建立時間：{{ recipe.create_time }}</p>
+                <p>建立時間：{{ recipe.create_time|date:"Y-m-d" }}</p>
+            </div>
+            <div style="display: flex; justify-content: center; margin-top: 20px;">
+                <button id="viewRecipe_{{ recipe.id }}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-300 rounded-lg hover:bg-red-300 focus:ring-4 focus:outline-none focus:bg-red-300 dark:bg-red-300 dark:hover:bg-red-300 dark:focus:bg-red-300">
+                    查看食譜
+                </button>
             </div>
         </div>
         {% endfor %}
@@ -54,30 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const recipeList = document.getElementById('recipe-list');
     const searchInput = document.getElementById('simple-search');
 
-    // 檢查 URL 是否包含搜尋參數
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchTerm = urlParams.get('simple-search');
-
-    if (searchTerm) {
-        // 如果 URL 包含搜尋參數，設置輸入框的值並執行搜尋
-        searchInput.value = searchTerm;
-        fetch(`/search_recipe/?simple-search=${encodeURIComponent(searchTerm)}`, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            updateRecipeList(data);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            recipeList.innerHTML = '<div class="col-span-full text-center text-red-500">搜尋失敗，請稍後再試</div>';
-        });
-    } else {
-        // 如果沒有搜尋參數，載入所有食譜
-        fetch('/recipe_list/', {
+    fetch('/recipe_list/', {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
             }
@@ -90,7 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error:', error);
             recipeList.innerHTML = '<div class="col-span-full text-center text-red-500">載入失敗，請重新整理頁面</div>';
         });
-    }
 
     // 處理搜尋表單提交
     searchForm.addEventListener('submit', function(event) {
@@ -98,10 +79,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const searchTerm = document.getElementById('simple-search').value;
         
         // 更新 URL
-        const searchParams = new URLSearchParams(window.location.search);
-        searchParams.set('simple-search', searchTerm);
-        const newUrl = `/search_recipe/?${searchParams.toString()}`;
-        window.history.pushState({ path: newUrl }, '', newUrl);
+        if(searchTerm) {
+            const searchParams = new URLSearchParams(window.location.search);
+            searchParams.set('simple-search', searchTerm);
+            const newUrl = `/search_recipe/?${searchParams.toString()}`;
+            window.history.pushState({ path: newUrl }, '', newUrl);
+        }
+        else {
+            const newUrl = `/recipe_list/`;
+            window.history.pushState({ path: newUrl }, '', newUrl);
+        }
         
         // 發送搜尋 API 請求
         fetch(`/search_recipe/?simple-search=${encodeURIComponent(searchTerm)}`, {
@@ -128,7 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         recipeList.innerHTML = recipes.map(recipe => `
-            <div class="max-w-sm w-full p-6 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
+            <div class="max-w-sm p-6 mx-4 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
                 <h2 class="text-xl font-bold mb-2">${recipe.name}</h2>
                 <div class="mb-4">
                     <h3 class="font-semibold mb-2">食材：</h3>
@@ -136,7 +123,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="text-sm text-gray-500">
                     <p>作者：${recipe.user}</p>
-                    <p>建立時間：${recipe.create_time}</p>
+                    <p>建立時間：${recipe.create_time.split(' ')[0]}</p>
+                </div>
+                <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+                    <button id="viewRecipe_${recipe.id}" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-300 rounded-lg hover:bg-red-300 focus:ring-4 focus:outline-none focus:bg-red-300 dark:bg-red-300 dark:hover:bg-red-300 dark:focus:bg-red-300">
+                        查看食譜
+                    </button>
                 </div>
             </div>
         `).join('');
