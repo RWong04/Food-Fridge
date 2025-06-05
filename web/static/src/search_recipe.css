@@ -6,8 +6,14 @@ html, body, main {
 
 .list-container {
     width: 100%;
-    height: 80%;
+    height: calc(100vh - 64px - 64px);
     position: absolute;
+}
+
+.content-container {
+    height: calc(100vh - 64px - 64px); /* 減去 header 和 footer 的高度 */
+    overflow-y: auto;
+    padding: 2rem;
 }
 
 #search-food-form {
