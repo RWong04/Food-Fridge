@@ -3,7 +3,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'src/style.css' %}">
-<link rel="stylesheet" href="{% static 'src/map.css' %}">
+<link rel="stylesheet" href="{% static 'src/search_recipe.css' %}">
 {% endblock %}
 
 {% block title %}以列表顯示{% endblock %}
@@ -22,7 +22,75 @@
             <span class="sr-only">Search</span>
         </button>
     </form>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="recipe-list">
+        {% for recipe in recipes %}
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold mb-2">{{ recipe.name }}</h2>
+            <p class="text-gray-600 mb-4">{{ recipe.description }}</p>
+            <div class="mb-4">
+                <h3 class="font-semibold mb-2">食材：</h3>
+                <ul class="list-disc list-inside">
+                    {% for ingredient in recipe.ingredients %}
+                    <li>{{ ingredient.name }} {{ ingredient.quantity }}{{ ingredient.unit }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="text-sm text-gray-500">
+                <p>作者：{{ recipe.user }}</p>
+                <p>建立時間：{{ recipe.create_time }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 
+{% csrf_token %}
+{% endblock %}
 
+{% block script %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchForm = document.getElementById('search-food-form');
+    const recipeList = document.getElementById('recipe-list');
+
+    searchForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const searchTerm = document.getElementById('simple-search').value;
+        
+        // 發送 AJAX 請求
+        fetch(`/recipe_list/?search=${encodeURIComponent(searchTerm)}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // 更新食譜列表
+            recipeList.innerHTML = data.recipes.map(recipe => `
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-xl font-bold mb-2">${recipe.name}</h2>
+                    <p class="text-gray-600 mb-4">${recipe.description}</p>
+                    <div class="mb-4">
+                        <h3 class="font-semibold mb-2">食材：</h3>
+                        <ul class="list-disc list-inside">
+                            ${recipe.ingredients.map(ingredient => 
+                                `<li>${ingredient.name} ${ingredient.quantity}${ingredient.unit}</li>`
+                            ).join('')}
+                        </ul>
+                    </div>
+                    <div class="text-sm text-gray-500">
+                        <p>作者：${recipe.user}</p>
+                        <p>建立時間：${recipe.create_time}</p>
+                    </div>
+                </div>
+            `).join('');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+});
+</script>
 {% endblock %}

@@ -1,7 +1,40 @@
 from django.shortcuts import render
+from django.http import JsonResponse
+from .models import Recipe, RecipeIngredient
 
 # Create your views here.
 
 def recipe_list(request):
-    # 回傳地圖 HTML 頁面
-    return render(request, 'search_recipe.html')
+    # 獲取所有食譜
+    recipes = Recipe.objects.all()
+    
+    # 將食譜資料轉換為 JSON 格式
+    recipes_data = []
+    for recipe in recipes:
+        # 獲取該食譜的所有食材
+        ingredients = RecipeIngredient.objects.filter(recipe=recipe)
+        ingredients_data = [
+            {
+                'name': ingredient.ingredient.name,
+                'quantity': ingredient.quantity,
+                'unit': ingredient.unit
+            }
+            for ingredient in ingredients
+        ]
+        
+        recipe_data = {
+            'id': recipe.id,
+            'name': recipe.name,
+            'description': recipe.description,
+            'create_time': recipe.create_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'user': recipe.user.username,
+            'ingredients': ingredients_data
+        }
+        recipes_data.append(recipe_data)
+    
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        # 如果是 AJAX 請求，返回 JSON 數據
+        return JsonResponse({'recipes': recipes_data})
+    
+    # 如果是普通請求，返回頁面
+    return render(request, 'search_recipe.html', {'recipes': recipes_data})
