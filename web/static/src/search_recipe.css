@@ -4,15 +4,31 @@ html, body, main {
     padding: 0;
 }
 
+.list-container {
+    width: 100%;
+    height: 80%;
+    margin-top: 20%;
+    position: relative;
+    overflow: hidden;
+}
+
 #search-food-form {
     width: 80%;
     height: 100px;
     position: absolute;
-    top: 10%;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     align-items: center;
     background-color: transparent;
     z-index: 1000;
+}
+
+#recipe-list {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    align-items: center;
+    justify-content: center;
+    overflow-y: auto
 }

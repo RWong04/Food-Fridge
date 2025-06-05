@@ -10,22 +10,21 @@
 {% block navbar_title %}搜尋食譜{% endblock %}
 {% block main_class %}h-screen overflow-hidden{% endblock %}
 {% block content %}
+<form class="flex items-center max-w-sm mx-auto" id="search-food-form" action="/search_recipe/" method="GET">   
+    <div class="relative w-full">
+        <input type="text" id="simple-search" name="simple-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="搜尋食譜" required />
+    </div>
+    <button type="submit" class="p-2.5 ms-2 text-sm font-medium text-white bg-red-300 rounded-lg border bg-red-300 hover:bg-red-400 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-red-200 dark:hover:bg-red-400 dark:focus:ring-blue-800">
+        <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+        </svg>
+        <span class="sr-only">Search</span>
+    </button>
+</form>
 <div class="list-container">
-    <form class="flex items-center max-w-sm mx-auto" id="search-food-form" action="/search_recipe/" method="GET">   
-        <div class="relative w-full">
-            <input type="text" id="simple-search" name="simple-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="搜尋食譜" required />
-        </div>
-        <button type="submit" class="p-2.5 ms-2 text-sm font-medium text-white bg-red-300 rounded-lg border bg-red-300 hover:bg-red-400 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-red-200 dark:hover:bg-red-400 dark:focus:ring-blue-800">
-            <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-            </svg>
-            <span class="sr-only">Search</span>
-        </button>
-    </form>
-
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="recipe-list">
         {% for recipe in recipes %}
-        <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
             <h2 class="text-xl font-bold mb-2">{{ recipe.name }}</h2>
             <p class="text-gray-600 mb-4">{{ recipe.description }}</p>
             <div class="mb-4">
@@ -69,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             // 更新食譜列表
             recipeList.innerHTML = data.recipes.map(recipe => `
-                <div class="bg-white rounded-lg shadow-md p-6">
+                 <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
                     <h2 class="text-xl font-bold mb-2">${recipe.name}</h2>
                     <p class="text-gray-600 mb-4">${recipe.description}</p>
                     <div class="mb-4">
