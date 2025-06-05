@@ -16,6 +16,7 @@ html, body, main {
     width: 80%;
     height: 100px;
     position: absolute;
+    top: 5%;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -29,6 +30,5 @@ html, body, main {
     height: 100%;
     position: absolute;
     align-items: center;
-    justify-content: center;
     overflow-y: auto
 }

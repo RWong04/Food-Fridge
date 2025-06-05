@@ -8,11 +8,12 @@
 
 {% block title %}以列表顯示{% endblock %}
 {% block navbar_title %}搜尋食譜{% endblock %}
-{% block main_class %}h-screen overflow-hidden{% endblock %}
+{% block main_class %}min-h-screen{% endblock %}
+
 {% block content %}
 <form class="flex items-center max-w-sm mx-auto" id="search-food-form" action="/search_recipe/" method="GET">   
     <div class="relative w-full">
-        <input type="text" id="simple-search" name="simple-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="搜尋食譜" required />
+        <input type="text" id="simple-search" name="simple-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="搜尋食譜" />
     </div>
     <button type="submit" class="p-2.5 ms-2 text-sm font-medium text-white bg-red-300 rounded-lg border bg-red-300 hover:bg-red-400 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-red-200 dark:hover:bg-red-400 dark:focus:ring-blue-800">
         <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
@@ -22,9 +23,9 @@
     </button>
 </form>
 <div class="list-container">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="recipe-list">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 content-start" id="recipe-list">
         {% for recipe in recipes %}
-        <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
+        <div class="max-w-sm w-full p-6 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
             <h2 class="text-xl font-bold mb-2">{{ recipe.name }}</h2>
             <p class="text-gray-600 mb-4">{{ recipe.description }}</p>
             <div class="mb-4">
@@ -52,13 +53,16 @@
 document.addEventListener('DOMContentLoaded', function() {
     const searchForm = document.getElementById('search-food-form');
     const recipeList = document.getElementById('recipe-list');
+    const searchInput = document.getElementById('simple-search');
 
-    searchForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-        const searchTerm = document.getElementById('simple-search').value;
-        
-        // 發送 AJAX 請求
-        fetch(`/recipe_list/?search=${encodeURIComponent(searchTerm)}`, {
+    // 檢查 URL 是否包含搜尋參數
+    const urlParams = new URLSearchParams(window.location.search);
+    const searchTerm = urlParams.get('simple-search');
+
+    if (searchTerm) {
+        // 如果 URL 包含搜尋參數，設置輸入框的值並執行搜尋
+        searchInput.value = searchTerm;
+        fetch(`/search_recipe/?simple-search=${encodeURIComponent(searchTerm)}`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
@@ -66,30 +70,84 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(response => response.json())
         .then(data => {
-            // 更新食譜列表
-            recipeList.innerHTML = data.recipes.map(recipe => `
-                 <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
-                    <h2 class="text-xl font-bold mb-2">${recipe.name}</h2>
-                    <p class="text-gray-600 mb-4">${recipe.description}</p>
-                    <div class="mb-4">
-                        <h3 class="font-semibold mb-2">食材：</h3>
-                        <ul class="list-disc list-inside">
-                            ${recipe.ingredients.map(ingredient => 
-                                `<li>${ingredient.name} ${ingredient.quantity}${ingredient.unit}</li>`
-                            ).join('')}
-                        </ul>
-                    </div>
-                    <div class="text-sm text-gray-500">
-                        <p>作者：${recipe.user}</p>
-                        <p>建立時間：${recipe.create_time}</p>
-                    </div>
-                </div>
-            `).join('');
+            updateRecipeList(data);
         })
         .catch(error => {
             console.error('Error:', error);
+            recipeList.innerHTML = '<div class="col-span-full text-center text-red-500">搜尋失敗，請稍後再試</div>';
+        });
+    } else {
+        // 如果沒有搜尋參數，載入所有食譜
+        fetch('/recipe_list/', {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            updateRecipeList(data.recipes);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            recipeList.innerHTML = '<div class="col-span-full text-center text-red-500">載入失敗，請重新整理頁面</div>';
+        });
+    }
+
+    // 處理搜尋表單提交
+    searchForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const searchTerm = document.getElementById('simple-search').value;
+        
+        // 更新 URL
+        const searchParams = new URLSearchParams(window.location.search);
+        searchParams.set('simple-search', searchTerm);
+        const newUrl = `/search_recipe/?${searchParams.toString()}`;
+        window.history.pushState({ path: newUrl }, '', newUrl);
+        
+        // 發送搜尋 API 請求
+        fetch(`/search_recipe/?simple-search=${encodeURIComponent(searchTerm)}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            updateRecipeList(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            recipeList.innerHTML = '<div class="col-span-full text-center text-red-500">搜尋失敗，請稍後再試</div>';
         });
     });
+
+    // 更新食譜列表的共用函數
+    function updateRecipeList(recipes) {
+        if (!recipes || recipes.length === 0) {
+            recipeList.innerHTML = '<div class="col-span-full text-center text-gray-500">沒有找到相關的食譜</div>';
+            return;
+        }
+
+        recipeList.innerHTML = recipes.map(recipe => `
+            <div class="max-w-sm w-full p-6 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
+                <h2 class="text-xl font-bold mb-2">${recipe.name}</h2>
+                <p class="text-gray-600 mb-4">${recipe.description}</p>
+                <div class="mb-4">
+                    <h3 class="font-semibold mb-2">食材：</h3>
+                    <ul class="list-disc list-inside">
+                        ${recipe.ingredients.map(ingredient => 
+                            `<li>${ingredient.name} ${ingredient.quantity}${ingredient.unit}</li>`
+                        ).join('')}
+                    </ul>
+                </div>
+                <div class="text-sm text-gray-500">
+                    <p>作者：${recipe.user}</p>
+                    <p>建立時間：${recipe.create_time}</p>
+                </div>
+            </div>
+        `).join('');
+
+    }
 });
 </script>
 {% endblock %}
