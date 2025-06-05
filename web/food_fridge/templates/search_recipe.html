@@ -27,14 +27,13 @@
         {% for recipe in recipes %}
         <div class="max-w-sm w-full p-6 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
             <h2 class="text-xl font-bold mb-2">{{ recipe.name }}</h2>
-            <p class="text-gray-600 mb-4">{{ recipe.description }}</p>
             <div class="mb-4">
                 <h3 class="font-semibold mb-2">食材：</h3>
-                <ul class="list-disc list-inside">
+                <p class="text-gray-600">
                     {% for ingredient in recipe.ingredients %}
-                    <li>{{ ingredient.name }} {{ ingredient.quantity }}{{ ingredient.unit }}</li>
+                        {{ ingredient.name }}{% if not forloop.last %}、{% endif %}
                     {% endfor %}
-                </ul>
+                </p>
             </div>
             <div class="text-sm text-gray-500">
                 <p>作者：{{ recipe.user }}</p>
@@ -131,14 +130,9 @@ document.addEventListener('DOMContentLoaded', function() {
         recipeList.innerHTML = recipes.map(recipe => `
             <div class="max-w-sm w-full p-6 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
                 <h2 class="text-xl font-bold mb-2">${recipe.name}</h2>
-                <p class="text-gray-600 mb-4">${recipe.description}</p>
                 <div class="mb-4">
                     <h3 class="font-semibold mb-2">食材：</h3>
-                    <ul class="list-disc list-inside">
-                        ${recipe.ingredients.map(ingredient => 
-                            `<li>${ingredient.name} ${ingredient.quantity}${ingredient.unit}</li>`
-                        ).join('')}
-                    </ul>
+                    <p class="text-gray-600">${recipe.ingredients.map(ingredient => ingredient.name).join('、')}</p>
                 </div>
                 <div class="text-sm text-gray-500">
                     <p>作者：${recipe.user}</p>
