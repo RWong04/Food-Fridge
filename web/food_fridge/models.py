@@ -97,7 +97,7 @@ class Recipe(models.Model):
 
 # 食材
 class Ingredient(models.Model):
-    name = models.CharField(max_length=64, unique=True)
+    name = models.CharField(max_length=64, unique=True) # 食材名稱
 
     def __str__(self):
         return self.name

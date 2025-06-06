@@ -16,7 +16,7 @@
 {% block content %}
     <div class="container">
 
-        <form id="add-food-form" action="/add_food/" method="POST">
+        <form id="add-food-form" action="/app/add_food/" method="POST">
             <div class="form-group">
                 <label>商品名稱</label>
                 <div class="relative max-w-sm">
@@ -142,7 +142,7 @@
             }
     
             // 使用 AJAX 提交表單資料
-            fetch("/add_food/", {
+            fetch("/app/add_food/", {
                 method: "POST",
                 body: formData,
             })

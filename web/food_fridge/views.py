@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from .forms import CustomUserCreationForm, CustomUserChangeForm, FoodForm
 from django.http                 import JsonResponse, HttpResponse
@@ -8,7 +9,7 @@ from .models import Food
 import json
 from django.db.models            import Q
 import logging
-from .models import Recipe, CustomUser
+from .models import Recipe, CustomUser, Ingredient, RecipeIngredient
 
 logger = logging.getLogger(__name__)
 
@@ -232,59 +233,74 @@ def add_food(request):
 
 @csrf_exempt
 def add_recipe(request):
-    """
-    新增食譜 API: 接收 POST 請求，新增一筆食譜資料到資料庫。
-
-    請求方式：
-        POST
-
-    請求參數(form-data):
-        - recipe_name: 食譜名稱（必填）
-        - recipe_description: 食譜描述（選填）
-
-    回應格式(JSON):
-        成功：
-            {
-                "success": true,
-                "recipe_id": <新食譜ID>
-            }
-        失敗：
-            {
-                "success": false,
-                "error": <錯誤訊息>
-            }
-
-    Status Code 說明：
-        - 201: 建立成功
-        - 400: 請求參數錯誤(如缺少名稱或找不到用戶)
-        - 500: 伺服器內部錯誤
-    """
-
+    
     if request.method == 'POST':
         try:
             # 獲取表單資料
             name = request.POST.get('recipe_name')
             description = request.POST.get('recipe_description')
-            # 因為 models.py 已有 auto_now_add=True，所以不用輸入
+            
             if not name:
-                return JsonResponse({'success': False, 'error': 'Recipe name id required'}, status=400)
+                return JsonResponse({'success': False, 'error': 'Recipe name is required'}, status=400)
 
             # 暫時使用第一個用戶作為發布者
             user = CustomUser.objects.first()
             if not user:
                 return JsonResponse({'success': False, 'error': 'No user found'}, status=400)
 
-
-            # 把食譜加到資料庫
+            # 創建食譜
             recipe = Recipe.objects.create(
                 user=user,
                 name=name,
                 description=description,
             )
+            
+            # 處理食材數據
+            ingredient_index = 0
+            while ingredient_index < 10:  # 檢查最多10個食材欄位
+                ingredient_name = request.POST.get(f'ingredient_name_{ingredient_index}')
+                ingredient_quantity = request.POST.get(f'ingredient_quantity_{ingredient_index}')
+                ingredient_unit = request.POST.get(f'ingredient_unit_{ingredient_index}')
+                
+                # 如果找不到這個索引的食材名稱，跳出循環
+                if ingredient_name is None:
+                    ingredient_index += 1
+                    continue
+                
+                # 只有當食材名稱不為空時才處理
+                if ingredient_name and ingredient_name.strip():
+                    # 檢查數量是否有效
+                    try:
+                        quantity = float(ingredient_quantity) if ingredient_quantity else 0
+                        if quantity <= 0:
+                            ingredient_index += 1
+                            continue  # 跳過數量無效的食材
+                    except (ValueError, TypeError):
+                        ingredient_index += 1
+                        continue  # 跳過數量無效的食材
+                    
+                    # 單位預設值
+                    unit = ingredient_unit.strip() if ingredient_unit else '份'
+                    
+                    # 獲取或創建食材
+                    ingredient, created = Ingredient.objects.get_or_create(
+                        name=ingredient_name.strip()
+                    )
+                    
+                    # 創建食譜-食材關聯
+                    RecipeIngredient.objects.create(
+                        recipe=recipe,
+                        ingredient=ingredient,
+                        quantity=quantity,
+                        unit=unit
+                    )
+                
+                ingredient_index += 1
                 
             return JsonResponse({'success': True, 'recipe_id': recipe.id}, status=201)
+            
         except Exception as e:
+            logger.error(f"Error creating recipe: {str(e)}")
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
-
 
     return render(request, 'add_recipe.html')
