@@ -1,3 +1,13 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'src/newfood.css' %}">
+{% endblock %}
+
+{% block title %}個人資料{% endblock %}
+{% block navbar_title %}個人頁面{% endblock %}
+{% block main_class %}h-screen overflow-hidden{% endblock %}
 {% block content %}
   <h2>個人資料</h2>
   <p>帳號：{{ user.username }}</p>
