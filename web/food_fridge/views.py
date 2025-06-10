@@ -220,7 +220,11 @@ def add_food(request):
                 )
                 
                 logger.info(f"Successfully created food item with ID: {food.pk}")
-                return JsonResponse({'success': True, 'food_id': food.id}, status=201)
+                return JsonResponse({
+                    'success': True, 
+                    'food_id': food.id, 
+                    "redirect_url": "/app/profile/"
+                }, status=201, )
             except Exception as e:
                 logger.error(f"Error creating food item: {str(e)}")
                 return JsonResponse({'success': False, 'error': str(e)}, status=500)
@@ -304,3 +308,10 @@ def add_recipe(request):
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
     return render(request, 'add_recipe.html')
+
+@login_required
+def food_delete(request, pk):
+    if request.method == "POST":
+        food = get_object_or_404(Food, pk=pk, user=request.user)
+        food.delete()
+    return redirect('profile') 

@@ -11,6 +11,7 @@
     
     <link rel="stylesheet" href="{% static 'src/output.css' %}">
     
+    <link rel="icon" type="image/x-icon" href="{% static 'fridge.ico' %}">
     <!-- Leaflet CSS for map pages -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -26,7 +27,7 @@
             <!-- 還是這裡要放什麼剩食冰箱的logo? -->
         </div>
     </nav>
-    <main class="{% block main_class %}{% endblock %}">
+    <main class="{% block main_class %}{% endblock %}" style="padding-bottom: 7rem;">
         {% block content %}{% endblock %}
     </main>
     <footer class="fixed bottom-0 left-0 z-20 w-full p-4 bg-gray-200 border-t border-gray-200 rounded-4xl shadow-up-xl">
@@ -68,7 +69,7 @@
                 </a>
             </li>
             <li>
-                <a href="# ">
+                <a href="{% url 'profile' %}">
                     <!--profile-->
                     <svg class="w-[40px] h-[40px] text-dark-theme " aria-hidden="true " xmlns="http://www.w3.org/2000/svg " width="24 " height="24 " fill="currentColor " viewBox="0 0 24 24 ">
                         <path fill-rule="evenodd " d="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2 9a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1a4 4 0 0 0-4-4h-4Z " clip-rule="evenodd "/>

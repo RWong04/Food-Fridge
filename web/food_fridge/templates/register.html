@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}註冊帳號{% endblock %}
+{% block title %}註冊帳號 | 剩食冰箱{% endblock %}
 {% block navbar_title %}註冊{% endblock %}
 {% block content %}
 
@@ -40,6 +40,7 @@ document.getElementById('register-form').onsubmit = async function(e) {
     });
     const data = await response.json();
     if (response.status === 201 && data.redirect_url) {
+        alert("註冊成功！回到登入頁面");
         window.location.href = data.redirect_url;  // 成功時重定向
     } else {
         document.getElementById('register-result').innerText = JSON.stringify(data, null, 2);

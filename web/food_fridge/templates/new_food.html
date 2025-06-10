@@ -148,12 +148,13 @@
             })
             .then(response => response.json())  // 假設後端返回 JSON 資料
             .then(data => {
-                if (data.success) {
+                if (data.success && data.redirect_url) {
                     // 成功提交後清空表單欄位
                     document.getElementById("add-food-form").reset();
     
                     // 可選: 顯示成功消息
                     alert("表單已成功提交！");
+                    window.location.href = data.redirect_url;  // 假設有一個重定向 URL
                 } else {
                     // 處理錯誤情況
                     alert("提交失敗，請重試！");
@@ -162,6 +163,7 @@
             .catch(error => {
                 // 錯誤處理
                 alert("發生錯誤，請稍後再試！");
+                console.error("Error:", error);
             });
         });
     </script>
