@@ -18,4 +18,9 @@ from django.urls import path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # 聊天室
+    path('chat/', views.simple_chat, name='simple_chat'),
+    path('api/send_message/', views.send_simple_message, name='send_simple_message'),
+    path('api/messages/<int:meetup_id>/', views.get_simple_messages, name='get_simple_messages'),
+
 ]
