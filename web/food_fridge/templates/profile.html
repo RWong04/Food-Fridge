@@ -3,6 +3,7 @@
 {% block title %}我的帳號 | 剩食冰箱{% endblock %}
 {% block navbar_title %}我的帳號{% endblock %}
 
+{% block main_class %}h-screen overflow-hidden{% endblock %}
 {% block content %}
   <div class="flex items-start space-x-4 m-8 content-center" style="margin:5%;">
     <div>
@@ -18,8 +19,9 @@
       <a href="{% url 'profile_edit' %}" class="button mt-2 text-dark-theme hover:text-white border border-dark-theme hover:bg-dark-theme focus:ring-2 focus:outline-none focus:ring-light-theme font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">編輯個人資料</a>
     </div>
   </div>
-<div style="margin:5%;">
-  <h2 class="text-xl font-semibold mb-4">我的食物列表</h2>
+
+<div class="m-4 space-y-4">
+  <h2 class="text-xl font-semibold">我的剩食列表</h2>
 
   {% if foods %}
     <ul>
@@ -55,8 +57,49 @@
     </ul>
   {% else %}
     <div class="flex flex-col">
-      <p>你目前沒有上架任何食物。</p>
-      <a href="{% url 'add_food' %}" class="button mt-4 text-dark-theme hover:text-white border border-dark-theme hover:bg-dark-theme focus:ring-2 focus:outline-none focus:ring-light-theme font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">新增食物</a>
+      <p>你目前沒有上架任何剩食。</p>
+      <a href="{% url 'add_food' %}" class="button mt-4 text-dark-theme hover:text-white border border-dark-theme hover:bg-dark-theme focus:ring-2 focus:outline-none focus:ring-light-theme font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">新增剩食</a>
+    </div>
+  {% endif %}
+
+  <h2 class="text-xl font-semibold">我的食譜列表</h2>
+
+  {% if recipes %}
+    <ul>
+      {% for recipe in recipes %}
+        <li class="flex justify-between items-center rounded-xl border border-gray-300 p-3 mb-2" style="padding: 2%">
+          <div class="flex items-center space-x-4">
+            {% if recipe.img_path %}
+              <img src="{{ recipe.img_path.url }}" alt="{{ recipe.name }}" width="80">
+            {% else %}
+              <img src="{% static 'default_food.png' %}" alt="預設食物圖片" width="80">
+            {% endif %}
+
+            <strong>{{ recipe.name }}</strong>
+          </div>
+          <div class="flex items-center space-x-2">
+            <!-- TODO: add recipe edit page -->
+            <a href="#" class="float-right ml-2 inline basis-1/5">
+              <svg class="w-[32] h-[32] text-light-theme hover:fill-light-theme" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"/>
+              </svg>
+            </a>
+            <form action="{% url 'recipe_delete' recipe.pk %}" method="post" class="float-right ml-2 inline basis-1/5">
+                {% csrf_token %}
+                <button type="submit" onclick="return confirm('確定要刪除嗎？')">
+                  <svg class="w-[32] h-[32] text-red-600 hover:fill-red-600" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"/>
+                  </svg>
+                </button>
+            </form>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="flex flex-col">
+      <p>你目前沒有發布任何食譜。</p>
+      <a href="{% url 'add_recipe' %}" class="button mt-4 text-dark-theme hover:text-white border border-dark-theme hover:bg-dark-theme focus:ring-2 focus:outline-none focus:ring-light-theme font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">新增食譜</a>
     </div>
   {% endif %}
   </div>

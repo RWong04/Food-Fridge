@@ -45,19 +45,19 @@ def login_view(request):
             password = data.get('password')
         except Exception:
             return JsonResponse({
-                "message": "Invalid JSON.",
+                "message": "格式不符，請聯絡管理員",
                 "error_code": 103
             }, status=400)
         if not username or not password:
             return JsonResponse({
-                "message": "Username and password required.",
+                "message": "帳號密碼不得為空！",
                 "error_code": 104
             }, status=400)
         user = authenticate(username=username, password=password)
         if user is not None:
             login(request, user)
             return JsonResponse({
-                    "message": "Login successfully!",
+                    "message": "成功登入！",
                     "redirect_url": "/app/profile/"
                 }, status=201)
         else:
@@ -68,14 +68,17 @@ def login_view(request):
     return render(request, "login.html")
 
 @csrf_exempt
-@login_required
+@login_required(login_url='/app/login_alert/')
 def profile_view(request):
     user = request.user
     foods = user.foods.all()
-    return render(request, 'profile.html', {'user': user, 'foods': foods})
+    recipes = user.recipes.all()
+    return render(request, 'profile.html', {'user': user, 'foods': foods, 'recipes': recipes})
 
+def login_alert(request):
+    return render(request, 'login_alert.html')
 @csrf_exempt
-@login_required
+@login_required(login_url='/app/login_alert/')
 def profile_edit_view(request):
     user = request.user
     if request.method == 'POST':
@@ -83,7 +86,7 @@ def profile_edit_view(request):
         if form.is_valid():
             form.save()
             return JsonResponse({
-                    "message": "Profile updated successfully!",
+                    "message": "更新個人檔案成功！",
                     "redirect_url": "/app/profile/"
                 }, status=201)
         return JsonResponse({"errors": form.errors}, status=400)
@@ -92,7 +95,7 @@ def profile_edit_view(request):
     return render(request, 'profile_edit.html', {'form': form})
 
 @csrf_exempt
-@login_required
+@login_required(login_url='/app/login_alert/')
 def food_edit_view(request, pk):
     food = get_object_or_404(Food, pk=pk, user=request.user)
     if request.method == 'POST':
@@ -103,8 +106,6 @@ def food_edit_view(request, pk):
     else:
         form = FoodForm(instance=food)
     return render(request, 'food_edit.html', {'form': form, 'food': food})
-
-
 
 @csrf_exempt
 def search_page(request):
@@ -145,6 +146,7 @@ def search_api(request):
         return HttpResponse(status=405, reason='Method Not Allowed')
     
 @csrf_exempt
+@login_required(login_url='/app/login_alert/')
 def add_food(request):
     if request.method == 'POST':
         try:
@@ -189,11 +191,9 @@ def add_food(request):
 
             # 創建食物記錄
             try:
-                # 暫時使用第一個用戶作為發布者
-                user = CustomUser.objects.first()
-                if not user:
-                    logger.error("No user found in database")
-                    return JsonResponse({'success': False, 'error': 'No user found'}, status=500)
+                user = request.user
+                if not user or not user.is_authenticated:
+                    return JsonResponse({'success': False, 'error': 'No user found'}, status=400)
 
                 # 處理數值轉換
                 try:
@@ -236,6 +236,7 @@ def add_food(request):
     return render(request, 'new_food.html')
 
 @csrf_exempt
+@login_required(login_url='/app/login_alert/')
 def add_recipe(request):
     
     if request.method == 'POST':
@@ -247,9 +248,8 @@ def add_recipe(request):
             if not name:
                 return JsonResponse({'success': False, 'error': 'Recipe name is required'}, status=400)
 
-            # 暫時使用第一個用戶作為發布者
-            user = CustomUser.objects.first()
-            if not user:
+            user = request.user
+            if not user or not user.is_authenticated:
                 return JsonResponse({'success': False, 'error': 'No user found'}, status=400)
 
             # 創建食譜
@@ -301,7 +301,7 @@ def add_recipe(request):
                 
                 ingredient_index += 1
                 
-            return JsonResponse({'success': True, 'recipe_id': recipe.id}, status=201)
+            return JsonResponse({'success': True, 'recipe_id': recipe.id, 'redirect_url': '/app/profile/'}, status=201)
             
         except Exception as e:
             logger.error(f"Error creating recipe: {str(e)}")
@@ -309,9 +309,16 @@ def add_recipe(request):
 
     return render(request, 'add_recipe.html')
 
-@login_required
+@login_required(login_url='/app/login_alert/')
 def food_delete(request, pk):
     if request.method == "POST":
         food = get_object_or_404(Food, pk=pk, user=request.user)
         food.delete()
     return redirect('profile') 
+
+@login_required(login_url='/app/login_alert/')
+def recipe_delete(request, pk):
+    if request.method == "POST":
+        recipe = get_object_or_404(Recipe, pk=pk, user=request.user)
+        recipe.delete()
+    return redirect('profile')

@@ -13,5 +13,7 @@ urlpatterns = [
     path('map/', views.search_page, name='search_page'),       # 地圖頁面
     path('api/search/', views.search_api, name='search_api'),     # 搜尋 API
     path('add_food/', views.add_food, name='add_food'),  # 新增食材
-    path('add_recipe/', views.add_recipe, name='addRecipe'),
+    path('add_recipe/', views.add_recipe, name='add_recipe'),
+    path('recipe/<int:pk>/delete/', views.recipe_delete, name='recipe_delete'),
+    path('login_alert/', views.login_alert, name='login_alert'),  # 登入提示頁面
 ]

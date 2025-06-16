@@ -81,8 +81,7 @@ WSGI_APPLICATION = 'Food_Waste_Fridge.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-
-
+# Docker PostgreSQL 配置 (生產環境)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -91,6 +90,14 @@ DATABASES = {
         'PASSWORD': 'db_pwd',  # 直接寫死密碼
         'HOST': 'db',
         'PORT': '5432',
+    }
+}
+
+# 本地開發 SQLite 配置
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 AUTH_USER_MODEL = 'food_fridge.CustomUser'

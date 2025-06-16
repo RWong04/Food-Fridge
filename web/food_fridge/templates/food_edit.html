@@ -1,5 +1,11 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}編輯食物資訊 | 剩食冰箱{% endblock %}
+{% block navbar_title %}編輯食物{% endblock %}
+
+{% block main_class %}h-screen overflow-hidden{% endblock %}
 {% block content %}
-<h2>編輯食物資訊</h2>
 
 <form method="post" enctype="multipart/form-data">
   {% csrf_token %}

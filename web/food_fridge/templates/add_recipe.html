@@ -206,6 +206,10 @@
 
                         // 顯示成功消息
                         alert("食譜已成功提交！");
+                        if(data.redirect_url) {
+                            // 如果有重定向URL，則跳轉
+                            window.location.href = data.redirect_url;
+                        }
                     } else {
                         // 處理錯誤情況
                         alert("提交失敗：" + (data.error || "請重試！"));

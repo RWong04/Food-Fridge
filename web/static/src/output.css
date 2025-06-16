@@ -1455,7 +1455,7 @@ utilities;
         }
     }
     .rounded-4xl {
-        border-radius: var(--radius-4xl);
+        border-radius: var(--radius-4xl) var(--radius-4xl) 0 0;
     }
     .rounded-full {
         border-radius: calc(infinity * 1px);
