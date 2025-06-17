@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'src/style.css' %}">
+<link rel="stylesheet" href="{% static 'src/map.css' %}">
+{% endblock %}
+
+{% block title %}以地圖顯示{% endblock %}
+{% block navbar_title %}搜尋{% endblock %}
+{% block main_class %}h-screen overflow-hidden{% endblock %}
+{% block content %}
+
+<div class="map-container">
+    <form class="flex items-center max-w-sm mx-auto" id="search-food-form" action="/api/search/" method="GET">   
+        <div class="relative w-full">
+            <input type="text" id="simple-search" name="simple-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="搜尋剩食" required />
+        </div>
+        <button type="submit" class="p-2.5 ms-2 text-sm font-medium text-white bg-red-300 rounded-lg border bg-red-300 hover:bg-red-400 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-red-200 dark:hover:bg-red-400 dark:focus:ring-blue-800">
+            <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+            </svg>
+            <span class="sr-only">Search</span>
+        </button>
+    </form>
+
+    <div id="info-window" class="info-window" >
+        <button class="close-btn" onclick="closeInfoWindow()">×</button>
+        <div class="scroll-window"></div>
+    </div>
+
+    <div class="detail-window">
+        <button class="close-btn" onclick="closeDetailWindow()">×</button>
+    </div>
+
+    <div id="map"></div>
+    
+    {% csrf_token %}
+</div>
+
+{% endblock %}
+
+{% block script %}
+       <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+           integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="">
+        </script>
+
+        <script>
+        // To initialize the map--------------------------------------------------------------//
+            var map = L.map('map', {zoomControl: false}).setView([23.773, 120.959], 8);
+
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            var redIcon = new L.Icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            });
+
+            var goldIcon = new L.Icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            });
+
+           // get user's location
+            map.locate({
+               setView: true,
+               maxZoom: 512,
+            });
+
+            function onLocationFound(e) {
+
+                L.marker(e.latlng).addTo(map)
+                   .openPopup();
+
+                L.circle(e.latlng, e.accuracy).addTo(map);
+            }
+            map.on('locationfound', onLocationFound);
+
+            function onLocationError(e) {
+               alert("找不到您的位置！");
+            }
+            map.on('locationerror', onLocationError);
+        //--------------------------------------------------------------To initialize the map//
+
+        // Set every window that will show on this page---------------------------------------------------//
+            const searchForm = document.getElementById('search-food-form');
+            const searchInput = document.getElementById('simple-search');
+            const infoWindow = document.getElementById("info-window");
+            const scrollWindow = document.querySelector(".scroll-window");
+            var needToOpenInfoWindow = true; // Flag to track if the info window should be opened
+
+            // initial
+            window.addEventListener('DOMContentLoaded', () => {
+                fetch('api/search/')
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    // data 是全部的 food 陣列
+                    data.forEach(food => {
+                        if (food.latitude && food.longitude) {
+                          const marker = L.marker([food.latitude, food.longitude], { icon: goldIcon }).addTo(map);
+                      
+                          marker.on('click', () => {
+                            // 這裡要模擬一個物件，傳給 showDetailInfo 用
+                            needToOpenInfoWindow = false; // Set the flag to false to prevent opening the info window again
+                            const fakeButton = {
+                              dataset: {
+                                foodUser: food.user,
+                                foodId: food.id,
+                                foodName: food.name,
+                                foodDescription: food.description,
+                                foodQuantity: food.quantity,
+                                foodUnit: food.unit,
+                                foodPrice: food.price,
+                                foodExpiration: new Date(food.expiration).toLocaleDateString(),
+                                foodAddress: food.food_address,
+                                foodLatitude: food.latitude,
+                                foodLongitude: food.longitude
+                              }
+                            };
+                            showDetailInfo(fakeButton);
+                          });
+                        }
+                      });                      
+                })
+                .catch(err => {
+                    console.error('Failed to load food data:', err);
+                });
+            });
+    
+            //  add event listener to the form
+            searchForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+    
+                const searchTerm = searchInput.value;  // get keyword from input
+                //alert(`Searching for: ${searchTerm}`);
+    
+                fetch('http://localhost:16701/app/map/api/search/?simple-search=' + encodeURIComponent(searchTerm))
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        //  show info window
+                        needToOpenInfoWindow = true; // Set the flag to true to allow opening the info window again
+                        displaySearchResults(data);
+                        history.pushState(null, '', 'http://localhost:16701/app/map/api/search/?simple-search=' + encodeURIComponent(searchTerm));
+                    })
+                    .catch(error => {
+                        console.error('There was a problem with the fetch operation:', error);
+                        alert('Failed to retrieve search results.');
+                    });
+            });
+    
+            function displaySearchResults(results) {
+                // show the info window
+                infoWindow.style.display = "block";
+                //  clear previous results
+                while (scrollWindow.firstChild) {
+                    scrollWindow.removeChild(scrollWindow.firstChild);
+                }
+            
+                var cardCount = results.length;
+                var infoHeader = document.createElement("div");
+                infoHeader.classList.add("info-header");
+                scrollWindow.appendChild(infoHeader);
+                infoHeader.textContent = `${cardCount} 則搜尋結果`;
+            
+                results.forEach(item => {
+                    var card = document.createElement("div");
+                    card.classList.add("info-content");
+                    card.innerHTML = `
+                        <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
+                            <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">${item.name}</h5>
+                            <p class="text-base text-gray-900 dark:text-gray-400">${item.description}</p>
+                            <p class="text-sm text-gray-700 dark:text-gray-400">價格: $${item.price}</p>
+                            <p class="text-sm text-gray-700 dark:text-gray-400">有效日期: ${new Date(item.expiration).toLocaleDateString()}</p>
+                            <p class="text-sm text-gray-700 dark:text-gray-400">地址: ${item.food_address}</p>
+                            <div style="display: flex; justify-content: flex-end;">
+                                <button 
+                                    class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-300 rounded-lg hover:bg-red-300 focus:ring-4 focus:outline-none focus:bg-red-300 dark:bg-red-300 dark:hover:bg-red-300 dark:focus:bg-red-300"
+                                    onclick="showDetailInfo(this)"
+                                    data-food-user="${item.user}"
+                                    data-food-id="${item.id}"
+                                    data-food-name="${item.name}"
+                                    data-food-description="${item.description}"
+                                    data-food-quantity="${item.quantity}"
+                                    data-food-unit="${item.unit}"
+                                    data-food-price="${item.price}"
+                                    data-food-expiration="${new Date(item.expiration).toLocaleDateString()}"
+                                    data-food-address="${item.food_address}"
+                                    data-food-latitude="${item.latitude}"
+                                    data-food-longitude="${item.longitude}"
+                                >
+                                    查看詳情
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    card.querySelector('.max-w-sm').style.width = '350px'; // Set desired width
+                    scrollWindow.appendChild(card);
+                });
+                infoWindow.style.display = "block";
+            }
+        
+        let foodMarker = null; // Initialize foodMarker variable
+        // open detail window 
+        function showDetailInfo(buttonElement) {
+            var infoWindow = document.getElementById("info-window");
+            var detailWindow = document.querySelector('.detail-window');
+            detailWindow.style.display = "block";
+        
+            const food = {
+                user: buttonElement.dataset.foodUser,
+                id: buttonElement.dataset.foodId,
+                name: buttonElement.dataset.foodName,
+                description: buttonElement.dataset.foodDescription,
+                quantity: buttonElement.dataset.foodQuantity,
+                unit: buttonElement.dataset.foodUnit,
+                price: buttonElement.dataset.foodPrice,
+                expiration: buttonElement.dataset.foodExpiration,
+                food_address: buttonElement.dataset.foodAddress,
+                latitude: buttonElement.dataset.foodLatitude,
+                longitude: buttonElement.dataset.foodLongitude
+            };
+        
+            if (infoWindow.style.display === "block") {
+                infoWindow.style.display = "none";
+                detailWindow.style.display = "block";
+            }
+        
+            detailWindow.innerHTML = '';
+            detailWindow.innerHTML = `
+                <div class="max-w-sm p-6 bg-white border border-gray-200 rounded-xl shadow-sm dark:bg-gray-800 dark:border-gray-700">
+                    <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">${food.name}</h5>
+                    <p class="text-base text-gray-900 dark:text-gray-400">${food.description}</p>
+                    <p class="text-sm text-gray-700 dark:text-gray-400">數量: ${food.quantity} ${food.unit}</p>
+                    <p class="text-sm text-gray-700 dark:text-gray-400">價格: $${food.price}</p>
+                    <p class="text-sm text-gray-700 dark:text-gray-400">有效日期: ${food.expiration}</p>
+                    <p class="text-sm text-gray-700 dark:text-gray-400">地址: ${food.food_address}</p>
+                    <p class="text-sm text-gray-700 dark:text-gray-400">賣家: ${food.user}</p>
+                    <button class="close-btn" onclick="closeDetailWindow()">×</button>
+                    <div style="display: flex; justify-content: center; margin-top: 20px;">
+                        <button id="contactBtn" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-300 rounded-lg hover:bg-red-300 focus:ring-4 focus:outline-none focus:bg-red-300 dark:bg-red-300 dark:hover:bg-red-300 dark:focus:bg-red-300">
+                            聯絡賣家
+                        </button>
+                    </div>
+                </div>
+            `;
+            updateMapMarker(food.latitude, food.longitude); // Update the map marker with the new coordinates
+        }
+               
+        //detail location
+        function updateMapMarker(latitude, longitude) {
+            if (foodMarker !== null) {
+                map.removeLayer(foodMarker); // Remove the old marker
+            }
+
+            if (latitude && longitude) {
+                let newLatLng = new L.LatLng(latitude, longitude);
+                map.setView(newLatLng, 512); // Center the map on the new location, you can adjust zoom level
+                foodMarker = L.marker(newLatLng, { icon: redIcon }).addTo(map); // Add a new marker
+            } else {
+                console.warn("Latitude or longitude is not available.");
+            }
+        }
+
+        // close info window
+        function closeInfoWindow() {
+            var infoWindow = document.getElementById("info-window");
+            if (infoWindow.style.display === "block") {
+                infoWindow.style.display = "none";
+                var scrollWindow = document.querySelector(".scroll-window");
+                
+            }
+        }
+
+        // close detail window
+        function closeDetailWindow() {
+            var detailWindow = document.querySelector('.detail-window');
+            var List = document.getElementById('info-window');
+            if (detailWindow.style.display === "block" && needToOpenInfoWindow) {
+                detailWindow.style.display = "none";
+                List.style.display = "block";
+            }
+            else {
+                detailWindow.style.display = "none";
+            }
+        }
+        // ---------------------------------------------------Set every window that will show on this page//
+        
+    </script>
+{% endblock %}

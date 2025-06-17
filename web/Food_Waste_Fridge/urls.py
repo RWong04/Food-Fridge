@@ -14,14 +14,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from food_fridge import views
+from django.urls import include, path
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('add_food/', views.add_food),
-    path('update_food/', views.update_food),
-    path('delete_food/', views.delete_food),
-    path('search/', views.search),
-    path('check_food/', views.check_food)
+    path('app/', include("food_fridge.urls")),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

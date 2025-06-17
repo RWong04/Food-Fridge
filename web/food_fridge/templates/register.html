@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}註冊帳號 | 剩食冰箱{% endblock %}
+{% block navbar_title %}註冊{% endblock %}
+{% block content %}
+
+<form class="max-w-sm mx-auto mt-5" id="register-form" method="POST" enctype="multipart/form-data">
+    <div class="mb-5">
+      <label for="username" class="block mb-2 text-sm font-medium text-gray-900" name="username">使用者名稱</label>
+      <input type="text" name="username" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
+    </div>
+    <div class="mb-5">
+      <label for="email" class="block mb-2 text-sm font-medium text-gray-900" name="email">電子郵件帳號</label>
+      <input type="text" name="email" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
+    </div>
+    <div class="mb-5">
+      <label for="password" class="block mb-2 text-sm font-medium text-gray-900">密碼</label>
+      <input type="password" name="password1" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
+    </div>
+    <div class="mb-5">
+      <label for="password" class="block mb-2 text-sm font-medium text-gray-900">確認密碼</label>
+      <input type="password" name="password2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" required />
+    </div>
+    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="user_avatar">上傳大頭照</label>
+    <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none" name="avatar" type="file" accept="image/*" />
+    <div class="mt-1 text-sm text-gray-500 dark:text-gray-300 mb-5" id="user_avatar_help">讓我們看到你最美麗的一面</div>
+  
+    <button type="submit" class="text-white bg-light-theme hover:bg-dark-theme focus:ring-4 focus:outline-none focus:ring-red-400 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">註冊</button>
+  </form>
+<div id="register-result"></div>
+{% endblock %}
+{% block script %}
+<script>
+document.getElementById('register-form').onsubmit = async function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const response = await fetch("{% url 'register' %}", {
+        method: "POST",
+        body: formData
+        // 不要加 Content-Type，瀏覽器會自動處理
+    });
+    const data = await response.json();
+    if (response.status === 201 && data.redirect_url) {
+        alert("註冊成功！回到登入頁面");
+        window.location.href = data.redirect_url;  // 成功時重定向
+    } else {
+        document.getElementById('register-result').innerText = JSON.stringify(data, null, 2);
+    }
+};
+</script>
+{% endblock %}

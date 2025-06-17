@@ -1,0 +1,114 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/earlyaccess/notosanstc.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />    
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+    
+    <link rel="stylesheet" href="{% static 'src/output.css' %}">
+    
+    <link rel="icon" type="image/x-icon" href="{% static 'fridge.ico' %}">
+    <!-- Leaflet CSS for map pages -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
+    {% block extra_css %}{% endblock %}
+    
+    <title>{% block title %}My Site{% endblock %}</title>
+</head>
+<body>
+    <nav class="bg-header border-gray-200 shadow-xl">
+        <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+            <div class="font-noto-sans text-dark-theme text-xl"> {%block navbar_title%} 剩食冰箱 {% endblock %}</div>
+            <!-- 還是這裡要放什麼剩食冰箱的logo? -->
+        </div>
+    </nav>
+    <main class="pt-4 {% block main_class %}{% endblock %}" style="padding-bottom: 7rem;">
+        {% block content %}{% endblock %}
+    </main>
+    <div id="add-backdrop" class="fixed inset-0 z-40 bg-black bg-opacity-50 hidden"></div>
+    <div id="add-panel" class="fixed inset-x-0 bottom-0 z-50 flex flex-col items-center pb-10 transition-transform duration-300 translate-y-full bg-white border-t border-gray-300 w-full rounded-t-2xl shadow-2xl">
+        <a type="button" href="{% url 'add_food' %}" class="p-4 w-11/12 text-center text-lg font-bold border-b border-gray-200">新增剩食</a>
+        <a type="button" href="{% url 'add_recipe' %}" class="p-4 w-11/12 text-center text-lg font-bold">新增食譜</a>
+    </div>
+
+    <footer class="fixed bottom-0 left-0 z-20 w-full p-4 bg-gray-200 border-t border-gray-200 rounded-4xl shadow-up-xl">
+        <ul class="relative flex flex-wrap justify-around mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
+            <li>
+                <!--get food by list or map-->
+                <a href="{% url 'search_page' %}">
+                    <svg class="w-[40px] h-[40px] text-dark-theme" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M9 8h10M9 12h10M9 16h10M4.99 8H5m-.02 4h.01m0 4H5"/>
+                      </svg>
+    
+                </a>
+            </li>
+            <li>
+                <!--messenger-->
+                <a href="#">
+                    <svg class="w-[40px] h-[40px] text-dark-theme" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                        <path fill-rule="evenodd" d="M4 3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h1v2a1 1 0 0 0 1.707.707L9.414 13H15a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4Z" clip-rule="evenodd"/>
+                        <path fill-rule="evenodd" d="M8.023 17.215c.033-.03.066-.062.098-.094L10.243 15H15a3 3 0 0 0 3-3V8h2a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1h-1v2a1 1 0 0 1-1.707.707L14.586 18H9a1 1 0 0 1-.977-.785Z" clip-rule="evenodd"/>
+                    </svg>
+                </a>
+            </li>
+            <li>
+                <svg class="w-[40px] h-[40px] text-gray-50 " aria-hidden="true " xmlns="http://www.w3.org/2000/svg " width="24 " height="24 " fill="none " viewBox="0 0 24 24 ">
+                    <path stroke="currentColor " stroke-linecap="round " stroke-linejoin="round " stroke-width="2 " d="M5 12h14m-7 7V5 "/>
+                </svg>
+                <!--add food or recipe-->
+            </li>
+            <li>
+                <!--recipe-->
+                <a href="# ">
+                    <svg class="w-[40px] h-[40px] text-dark-theme " aria-hidden="true " xmlns="http://www.w3.org/2000/svg " width="24 " height="24 " fill="none " viewBox="0 0 24 24 ">
+                        <path fill="currentColor " d="M15 3.00009H9.00003c-2.76143 0-5 2.23858-5 5v1c0 .55229.44771 1.00001 1 1.00001H19c.5523 0 1-.44773 1-1.00001v-1c0-2.76142-2.2386-5-5-5Z "/>
+                        <path fill="currentColor " d="m4.35115 12.9364 2.31554-.8683 2.31555.8683c.22638.0849.47586.0849.70224 0L12 12.0681l2.3156.8683c.2264.0849.4758.0849.7022 0l2.3156-.8683 2.3155.8683c.5171.1939 1.0935-.0681 1.2875-.5852.1939-.5171-.0681-1.0935-.5852-1.2874l-2.6667-1c-.2264-.08493-.4759-.08493-.7023
+                0l-2.3155.8683-2.3155-.8683c-.2264-.08493-.4759-.08493-.7023 0l-2.31554.8683-2.31554-.8683c-.22639-.08493-.47586-.08493-.70225 0l-2.66667 1c-.51712.1939-.77912.7703-.5852 1.2874.19392.5171.77033.7791 1.28745.5852Z "/>
+                        <path fill="currentColor " d="M21 15.5001c0 .8179-.3927 1.5441-1 2.0002v.4998c0 1.6568-1.3431 3-3 3H7.00003c-1.65686 0-3-1.3432-3-3v-.4998c-.60723-.4561-1-1.1823-1-2.0002 0-1.3807 1.11928-2.5 2.5-2.5H18.5c1.3807 0 2.5 1.1193
+                2.5 2.5Z "/>
+                      </svg>
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'profile' %}">
+                    <!--profile-->
+                    <svg class="w-[40px] h-[40px] text-dark-theme " aria-hidden="true " xmlns="http://www.w3.org/2000/svg " width="24 " height="24 " fill="currentColor " viewBox="0 0 24 24 ">
+                        <path fill-rule="evenodd " d="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2 9a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1a4 4 0 0 0-4-4h-4Z " clip-rule="evenodd "/>
+                    </svg>
+                </a>
+            </li>
+        </ul>
+    </footer>
+    <div id="add-backdrop" class="fixed inset-0 z-50 bg-black bg-opacity-50 hidden"></div>
+
+    <button type="button" id="add" class="fixed left-1/2 bottom-4 z-30 -translate-x-1/2 text-white bg-light-theme hover:bg-dark-theme focus:ring-4 focus:outline-none focus:ring-dark-theme font-medium rounded-full text-sm p-2.5 text-center shadow-lg me-2 flex items-center justify-center" onclick="">
+        <svg class="w-[52px] h-[52px] text-gray-50 " aria-hidden="true " xmlns="http://www.w3.org/2000/svg " width="24 " height="24 " fill="none " viewBox="0 0 24 24 ">
+            <path stroke="currentColor " stroke-linecap="round " stroke-linejoin="round " stroke-width="2 " d="M5 12h14m-7 7V5 "/>
+        </svg>
+        <span class="sr-only ">Icon description</span>
+    </button>
+    <script>
+    const addBtn = document.getElementById('add');
+    const addBackdrop = document.getElementById('add-backdrop');
+    const addPanel = document.getElementById('add-panel');
+
+    // 開啟
+    addBtn.addEventListener('click', function(e) {
+        addPanel.classList.remove('translate-y-full');
+        addBackdrop.classList.remove('hidden');
+    });
+
+    // 點 backdrop 關閉
+    addBackdrop.addEventListener('click', function() {
+        addPanel.classList.add('translate-y-full');
+        addBackdrop.classList.add('hidden');
+    });
+    </script>
+    {%block script%} {% endblock %}
+</body>
+</html>

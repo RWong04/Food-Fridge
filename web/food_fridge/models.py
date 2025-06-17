@@ -17,6 +17,12 @@ class CustomUser(AbstractUser):
         related_name="customuser_permissions",  # 關鍵設定
         related_query_name="customuser",
     )
+    avatar = models.ImageField(
+        upload_to='avatars/',  # 上傳到 MEDIA_ROOT/avatars/
+        blank=True,
+        null=True,
+        verbose_name='大頭貼'
+    )
 
     def __str__(self):
         return self.username
@@ -38,9 +44,15 @@ class Food(models.Model):
     price = models.DecimalField(max_digits=8, decimal_places=2)
     expiration_date = models.DateField()
     create_time = models.DateTimeField(auto_now_add=True)
-    img_path = models.CharField(max_length=255, blank=True, null=True)
+    img_path = models.ImageField(
+        upload_to='food_images/', 
+        blank=True, 
+        null=True, 
+        verbose_name='食物圖片'
+    )
     latitude = models.FloatField()
     longitude = models.FloatField()
+    food_address = models.CharField(max_length=255, blank=True)  # 新增地址欄位
     is_soldout = models.BooleanField(default=False)
 
     def __str__(self):
@@ -90,7 +102,7 @@ class Recipe(models.Model):
 
 # 食材
 class Ingredient(models.Model):
-    name = models.CharField(max_length=64, unique=True)
+    name = models.CharField(max_length=64, unique=True) # 食材名稱
 
     def __str__(self):
         return self.name

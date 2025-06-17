@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}請先登入{% endblock %}
+{% block navbar_title %}剩食冰箱{% endblock %}
+{% block main_class %}h-screen overflow-hidden{% endblock %}
+{% block content %}
+  <div class="flex items-center justify-center h-full">
+    <div class="flex flex-col items-center justify-center bg-white p-6 rounded-lg shadow-md">
+      <p class="mb-4 text-center">您沒有權限，請先登入以存取此頁面。</p>
+      <a href="{% url 'login' %}" class="button text-dark-theme hover:text-white border border-dark-theme hover:bg-dark-theme focus:ring-2 focus:outline-none focus:ring-light-theme font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">前往登入</a>
+    </div>
+  </div>
+{% endblock %}

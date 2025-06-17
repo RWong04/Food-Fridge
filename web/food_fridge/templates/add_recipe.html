@@ -1,0 +1,233 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'src/newrecipe.css' %}">
+{% endblock %}
+
+{% block title %}新增食譜{% endblock %}
+
+{% block navbar_title %}新增食譜{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <form id="addRecipeForm" action="/app/add_recipe/" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>食譜名稱</label>
+                <div class="relative max-w-sm">
+                    <input type="text" id="recipe-name" name="recipe_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>食譜描述</label>
+                <div class="relative max-w-sm">
+                    <textarea id="description"
+                        rows="4"
+                        name="recipe_description" 
+                        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        placeholder="請描述食譜">
+                    </textarea>
+                </div>
+            </div>
+
+            <!-- 食材區域 -->
+            <div class="ingredients-section">
+                
+                <div id="ingredients-container">
+                    <!-- 第一個食材欄位 -->
+                    <div class="ingredient-group" style="display: flex; align-items: center; justify-content: center; margin: 15px 20px; gap: 10px;">
+                        <label style="min-width: 60px; margin: 0;">食材1:</label>
+                        <input type="text" name="ingredient_name_0" placeholder="食材名稱" 
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                               style="width: 80px;">
+                        <input type="number" name="ingredient_quantity_0" placeholder="數量" step="0.1" min="0"
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                               style="width: 60px;">
+                        <input type="text" name="ingredient_unit_0" placeholder="單位" 
+                               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                               style="width: 60px;">
+                        <button type="button" onclick="removeIngredient(this)" style="background: #916070; color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: none; font-size: 16px; font-weight: bold;">-</button>
+                    </div>
+                </div>
+                
+                <!-- 添加食材按鈕 -->
+                <div style="text-align: center; margin: 20px 0;">
+                    <button type="button" id="addIngredientBtn" onclick="addIngredient()" 
+                            style="background-color: #D296AA; color: white; border: none; padding: 10px 20px; border-radius: 20px; font-size: 14px; cursor: pointer;">
+                        + 添加食材
+                    </button>
+                    <p style="color: #666; font-size: 12px; margin-top: 5px;">最多可添加10種食材</p>
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn">送出</button>
+        </form>
+    </div>
+{% endblock %}
+
+{% block script %}
+<script>
+    let ingredientCount = 1; // 追蹤當前食材數量
+    const maxIngredients = 10; // 最大食材數量
+
+    function addIngredient() {
+        if (ingredientCount >= maxIngredients) {
+            alert('最多只能添加10種食材');
+            return;
+        }
+
+        const container = document.getElementById('ingredients-container');
+        const newGroup = document.createElement('div');
+        newGroup.className = 'ingredient-group';
+        newGroup.style.cssText = 'display: flex; align-items: center; justify-content: center; margin: 15px 20px; gap: 10px;';
+        
+        newGroup.innerHTML = `
+            <label style="min-width: 60px; margin: 0;">食材${ingredientCount + 1}:</label>
+            <input type="text" name="ingredient_name_${ingredientCount}" placeholder="食材名稱" 
+                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                   style="width: 80px;">
+            <input type="number" name="ingredient_quantity_${ingredientCount}" placeholder="數量" step="0.1" min="0"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                   style="width: 60px;">
+            <input type="text" name="ingredient_unit_${ingredientCount}" placeholder="單位" 
+                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                   style="width: 60px;">
+            <button type="button" onclick="removeIngredient(this)" style="background: #916070; color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold;">-</button>
+        `;
+        
+        container.appendChild(newGroup);
+        ingredientCount++;
+
+        // 顯示第一個食材的刪除按鈕（當有多個食材時）
+        if (ingredientCount > 1) {
+            const firstDeleteBtn = container.querySelector('.ingredient-group button');
+            if (firstDeleteBtn) {
+                firstDeleteBtn.style.display = 'inline-block';
+            }
+        }
+
+        // 如果達到最大數量，隱藏添加按鈕
+        if (ingredientCount >= maxIngredients) {
+            document.getElementById('addIngredientBtn').style.display = 'none';
+        }
+    }
+
+    function removeIngredient(button) {
+        const container = document.getElementById('ingredients-container');
+        const group = button.parentElement;
+        
+        // 不能刪除最後一個食材
+        if (container.children.length <= 1) {
+            alert('至少需要一種食材');
+            return;
+        }
+        
+        container.removeChild(group);
+        ingredientCount--;
+        
+        // 重新編號所有食材
+        renumberIngredients();
+        
+        // 如果只剩一個食材，隱藏刪除按鈕
+        if (container.children.length === 1) {
+            const firstDeleteBtn = container.querySelector('.ingredient-group button');
+            if (firstDeleteBtn) {
+                firstDeleteBtn.style.display = 'none';
+            }
+        }
+        
+        // 顯示添加按鈕
+        document.getElementById('addIngredientBtn').style.display = 'inline-block';
+    }
+
+    function renumberIngredients() {
+        const container = document.getElementById('ingredients-container');
+        const groups = container.querySelectorAll('.ingredient-group');
+        
+        groups.forEach((group, index) => {
+            const label = group.querySelector('label');
+            const nameInput = group.querySelector('input[name^="ingredient_name_"]');
+            const quantityInput = group.querySelector('input[name^="ingredient_quantity_"]');
+            const unitInput = group.querySelector('input[name^="ingredient_unit_"]');
+            
+            label.textContent = `食材${index + 1}:`;
+            nameInput.name = `ingredient_name_${index}`;
+            quantityInput.name = `ingredient_quantity_${index}`;
+            unitInput.name = `ingredient_unit_${index}`;
+        });
+        
+        ingredientCount = groups.length;
+    }
+
+    document.getElementById("addRecipeForm").addEventListener("submit", async(event) => {
+        event.preventDefault();  // 阻止默認表單提交行為
+
+        const form = event.target;
+        const formData = new FormData(form);
+        
+        try {
+            const response = await fetch( "/app/add_recipe/", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                }
+            });
+
+            // 檢查響應的內容類型
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                const data = await response.json();
+                if (response.ok) {
+                    if (data.success) {
+                        document.getElementById("addRecipeForm").reset();
+                        
+                        // 重置食材欄位到初始狀態
+                        const container = document.getElementById('ingredients-container');
+                        container.innerHTML = `
+                            <div class="ingredient-group" style="display: flex; align-items: center; justify-content: center; margin: 15px 20px; gap: 10px;">
+                                <label style="min-width: 60px; margin: 0;">食材1:</label>
+                                <input type="text" name="ingredient_name_0" placeholder="食材名稱" 
+                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                       style="width: 80px;">
+                                <input type="number" name="ingredient_quantity_0" placeholder="數量" step="0.1" min="0"
+                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                       style="width: 60px;">
+                                <input type="text" name="ingredient_unit_0" placeholder="單位" 
+                                       class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                       style="width: 60px;">
+                                <button type="button" onclick="removeIngredient(this)" style="background: #916070; color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; display: none; font-size: 16px; font-weight: bold;">-</button>
+                            </div>
+                        `;
+                        ingredientCount = 1;
+                        document.getElementById('addIngredientBtn').style.display = 'inline-block';
+
+                        // 顯示成功消息
+                        alert("食譜已成功提交！");
+                        if(data.redirect_url) {
+                            // 如果有重定向URL，則跳轉
+                            window.location.href = data.redirect_url;
+                        }
+                    } else {
+                        // 處理錯誤情況
+                        alert("提交失敗：" + (data.error || "請重試！"));
+                    }
+                } else {
+                    console.error("提交過程發生錯誤:", data.error);
+                    alert("發生錯誤：" + (data.error || "請查看控制台了解錯誤訊息"));
+                }
+            } else {
+                // 響應不是JSON，可能是HTML錯誤頁面
+                const text = await response.text();
+                console.error("伺服器返回非JSON響應:", text);
+                alert("伺服器錯誤，請檢查網路連接或聯繫管理員");
+            }
+        } catch (error) {
+            console.error("提交過程發生錯誤:", error);
+            alert("發生錯誤，請檢查網路連接");
+        }
+    });
+</script>
+{% endblock %}

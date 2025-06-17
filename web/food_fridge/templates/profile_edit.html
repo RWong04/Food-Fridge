@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}更新個人資料 | 剩食冰箱{% endblock %}
+{% block navbar_title %}修改{% endblock %}
+{% block main_class %}h-screen overflow-hidden{% endblock %}
+{% block content %}
+<form class="max-w-sm mx-auto mt-5" id="profile-form" method="POST" enctype="multipart/form-data">
+    <div class="mb-5">
+      <label for="username" class="block mb-2 text-sm font-medium text-gray-900" name="username">使用者名稱</label>
+      <input type="username" name="username" value="{{ user.username }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"/>
+    </div>
+    <div class="mb-5">
+      <label for="email" class="block mb-2 text-sm font-medium text-gray-900" name="email">電子郵件帳號</label>
+      <input type="email" name="email" value="{{ user.email }}" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"/>
+    </div>
+    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="user_avatar">修改大頭照</label>
+    <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none" name="avatar" type="file" accept="image/*"/>
+  
+    <button type="submit" class="text-white bg-light-theme hover:bg-dark-theme focus:ring-4 focus:outline-none focus:ring-red-400 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center">儲存</button>
+  </form>
+<div id="profile-result"></div>
+{% endblock %}
+{% block script %}
+<script>
+document.getElementById('profile-form').onsubmit = async function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const response = await fetch("{% url 'profile_edit' %}", {  // Use the correct URL name
+        method: "POST",
+        body: formData
+    });
+    const data = await response.json();
+    if (response.status === 201 && data.redirect_url) {
+        alert("更新成功！回到個人資料頁面");
+        window.location.href = data.redirect_url;  // 成功時重定向
+} else {
+    alert(data.message || "更新失敗，請洽開發者");
+    window.location.reload();  // 失敗時重新載入頁面
+}
+};
+</script>
+{% endblock %}
+  

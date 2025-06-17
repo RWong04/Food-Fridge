@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'src/newfood.css' %}">
+{% endblock %}
+
+{% block title %}新增剩食{% endblock %}
+
+{% block script %}
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAU_L5YBhN79HUbrStpMXFQOLHPEUfNCNo&callback=initMap&loading=async" async defer></script>
+{% endblock %}
+
+{% block navbar_title %}新增剩食{% endblock %}
+
+{% block content %}
+    <div class="container">
+
+        <form id="add-food-form" action="/app/add_food/" method="POST">
+            <div class="form-group">
+                <label>商品名稱</label>
+                <div class="relative max-w-sm">
+                    <input type="text" id="food-name" name="food_name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>商品種類</label>
+                <select id="food-category" name="food_category" class="bg-gray-50 border border-gray-300 text-gray-500 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-100 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                    <option selected>請選擇商品種類</option>
+                    <option value="0">生食</option>
+                    <option value="1">熟食</option>
+                    <option value="2">其他</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>商品數量</label>
+                <div class="relative max-w-sm">
+                    <input type="text" id="quantity" name="food_quantity" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>商品單位</label>
+                <div class="relative max-w-sm">
+                    <input type="text" id="unit" name="food_unit" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>商品價格</label>
+                <div class="relative max-w-sm">
+                    <input type="text" id="price" name="food_price" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>有效日期</label>
+                <div class="relative max-w-sm">
+                    <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
+                        </svg>
+                    </div>
+                    <input id="datepicker-actions" datepicker datepicker-format="yyyy-mm-dd" datepicker-buttons datepicker-autoselect-today type="text" name="food_expired_date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="YYYY-MM-DD" required/>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <label>商品地址</label>
+                <div class="relative max-w-sm">
+                    <input type="text" id="address" name="food_address" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+                </div>
+            </div>
+            <input type="hidden" id="latitude" name="latitude">
+            <input type="hidden" id="longitude" name="longitude">
+
+            <div class="form-group">
+                <label>商品描述</label>
+                <div class="relative max-w-sm">
+                    <textarea id="description" rows="4" name="food_description" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="請描述商品"></textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>實物照片</label>
+                <div class="relative max-w-sm">
+                    <input id="food-image" name="food_image" class="block w-full mb-5 text-xs text-gray-500 border border-gray-600 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-500 dark:border-gray-600 dark:placeholder-gray-400" id="image" type="file">
+                </div>
+            </div>
+            {% comment %} <button type="button" id="submitBtn">送出</button> {% endcomment %}
+            <button type="submit" id="submitBtn">送出</button>
+        </form>
+    </div>
+    
+    <script>
+        function initMap() {
+            const latitudeInput = document.getElementById('latitude');
+            const longitudeInput = document.getElementById('longitude');
+            const addressInput = document.getElementById('address');
+            const geocoder = new google.maps.Geocoder(); // 創建 Geocoder 物件
+
+            // 當地址輸入框失去焦點時獲取經緯度
+            addressInput.addEventListener('blur', function() {
+                const address = addressInput.value;
+                if (address) {
+                    geocoder.geocode({ 'address': address }, function(results, status) {
+                        if (status === 'OK') {
+                            if (results[0]) {
+                                const latitude = results[0].geometry.location.lat();
+                                const longitude = results[0].geometry.location.lng();
+
+                                latitudeInput.value = latitude;
+                                longitudeInput.value = longitude;
+                            } else {
+                                alert('找不到該地址的座標。');
+                            }
+                        } else {
+                            alert('地址解析失敗，錯誤訊息：' + status);
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+
+    <script>
+        document.getElementById("add-food-form").addEventListener("submit", function(event) {
+            event.preventDefault();  // 阻止默認表單提交行為
+    
+            // 準備表單資料
+            const formData = new FormData(this);
+    
+            // 格式化日期為 YYYY-MM-DD
+            const dateInput = document.getElementById('datepicker-actions');
+            if (dateInput.value) {
+                const date = new Date(dateInput.value);
+                const formattedDate = date.toISOString().split('T')[0];
+                formData.set('food_expired_date', formattedDate);
+            }
+    
+            // 使用 AJAX 提交表單資料
+            fetch("/app/add_food/", {
+                method: "POST",
+                body: formData,
+            })
+            .then(response => response.json())  // 假設後端返回 JSON 資料
+            .then(data => {
+                if (data.success && data.redirect_url) {
+                    // 成功提交後清空表單欄位
+                    document.getElementById("add-food-form").reset();
+    
+                    // 可選: 顯示成功消息
+                    alert("表單已成功提交！");
+                    window.location.href = data.redirect_url;  // 假設有一個重定向 URL
+                } else {
+                    // 處理錯誤情況
+                    alert("提交失敗，請重試！");
+                }
+            })
+            .catch(error => {
+                // 錯誤處理
+                alert("發生錯誤，請稍後再試！");
+                console.error("Error:", error);
+            });
+        });
+    </script>
+
+
+{% endblock %}
