@@ -101,44 +101,63 @@
 
             // initial
             window.addEventListener('DOMContentLoaded', () => {
-                fetch('api/search/')
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.json();
-                })
-                .then(data => {
-                    // data 是全部的 food 陣列
-                    data.forEach(food => {
-                        if (food.latitude && food.longitude) {
-                          const marker = L.marker([food.latitude, food.longitude], { icon: goldIcon }).addTo(map);
-                      
-                          marker.on('click', () => {
-                            // 這裡要模擬一個物件，傳給 showDetailInfo 用
-                            needToOpenInfoWindow = false; // Set the flag to false to prevent opening the info window again
-                            const fakeButton = {
-                              dataset: {
-                                foodUser: food.user,
-                                foodId: food.id,
-                                foodName: food.name,
-                                foodDescription: food.description,
-                                foodQuantity: food.quantity,
-                                foodUnit: food.unit,
-                                foodPrice: food.price,
-                                foodExpiration: new Date(food.expiration).toLocaleDateString(),
-                                foodAddress: food.food_address,
-                                foodLatitude: food.latitude,
-                                foodLongitude: food.longitude
-                              }
-                            };
-                            showDetailInfo(fakeButton);
-                          });
-                        }
-                      });                      
-                })
-                .catch(err => {
-                    console.error('Failed to load food data:', err);
-                });
+                const urlParams = new URLSearchParams(window.location.search);
+                const query = urlParams.get('simple-search');
+
+                if (query) {
+                    searchInput.value = query;  // 顯示在 input 上
+                    fetch(`/app/map/api/search/?simple-search=${encodeURIComponent(query)}`)
+                        .then(response => {
+                            if (!response.ok) throw new Error('Network response was not ok');
+                            return response.json();
+                        })
+                        .then(data => {
+                            needToOpenInfoWindow = true;
+                            displaySearchResults(data);  // 顯示搜尋結果
+                        })
+                        .catch(err => {
+                            console.error('搜尋失敗:', err);
+                            alert('搜尋失敗，請稍後再試');
+                        });
+                } else {
+                    // 沒有搜尋參數就載入所有
+                    fetch('/app/map/api/search/')
+                        .then(response => {
+                            if (!response.ok) throw new Error('Network response was not ok');
+                            return response.json();
+                        })
+                        .then(data => {
+                            data.forEach(food => {
+                                if (food.latitude && food.longitude) {
+                                    const marker = L.marker([food.latitude, food.longitude], { icon: goldIcon }).addTo(map);
+                                    marker.on('click', () => {
+                                        needToOpenInfoWindow = false;
+                                        const fakeButton = {
+                                            dataset: {
+                                                foodUser: food.user,
+                                                foodId: food.id,
+                                                foodName: food.name,
+                                                foodDescription: food.description,
+                                                foodQuantity: food.quantity,
+                                                foodUnit: food.unit,
+                                                foodPrice: food.price,
+                                                foodExpiration: new Date(food.expiration).toLocaleDateString(),
+                                                foodAddress: food.food_address,
+                                                foodLatitude: food.latitude,
+                                                foodLongitude: food.longitude
+                                            }
+                                        };
+                                        showDetailInfo(fakeButton);
+                                    });
+                                }
+                            });
+                        })
+                        .catch(err => {
+                            console.error('載入失敗:', err);
+                        });
+                }
             });
+
     
             //  add event listener to the form
             searchForm.addEventListener('submit', function(event) {

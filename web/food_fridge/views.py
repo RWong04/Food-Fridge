@@ -151,7 +151,7 @@ def recipe_list(request):
 @csrf_exempt
 def search_recipe(request):
     if request.method == 'GET':
-        search_term = request.GET.get('simple-search', None)
+        search_term = request.GET.get('simple-search', '')
 
         recipes = Recipe.objects.filter(
             Q(name__icontains=search_term) |
@@ -161,7 +161,6 @@ def search_recipe(request):
 
         result = []
         for recipe in recipes:
-            # 獲取該食譜的所有食材
             ingredients = RecipeIngredient.objects.filter(recipe=recipe)
             ingredients_data = [
                 {
@@ -171,7 +170,6 @@ def search_recipe(request):
                 }
                 for ingredient in ingredients
             ]
-
             recipe_data = {
                 'id': recipe.id,
                 'name': recipe.name,
@@ -182,11 +180,17 @@ def search_recipe(request):
             }
             result.append(recipe_data)
 
-        return JsonResponse(result, safe=False)
-    else:
-        return HttpResponse(status=405, reason='Method Not Allowed')
-    
-    return JsonResponse({'error': 'Invalid request method'}, status=405)
+        # 如果是 AJAX 請求就回傳 JSON
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse(result, safe=False)
+
+        # 否則回傳 HTML 頁面
+        return render(request, 'search_recipe.html', {
+            'recipes': result,
+            'query': search_term
+        })
+
+    return HttpResponse(status=405, reason='Method Not Allowed')
 
 def recipe_detail(request, recipe_id):
     recipe = get_object_or_404(Recipe, id=recipe_id)

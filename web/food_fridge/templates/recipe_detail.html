@@ -11,7 +11,7 @@
 
 {% block content %}
 <div class="content-container">
-    <button onclick="window.history.back()" class="mb-6 inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-red-300 rounded-lg hover:bg-red-400 focus:ring-4 focus:outline-none focus:ring-red-300">
+    <button onclick="goBack()" class="mb-6 inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-red-300 rounded-lg hover:bg-red-400 focus:ring-4 focus:outline-none focus:ring-red-300">
         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
@@ -49,3 +49,18 @@
     </div>
 </div>
 {% endblock %} 
+
+{% block script %}
+<script>
+function goBack() {
+    const saved = sessionStorage.getItem('last_page');
+    if (saved) {
+        window.location.href = saved;
+    } else if (document.referrer && !document.referrer.includes(window.location.href)) {
+        window.location.href = document.referrer;
+    } else {
+        window.location.href = "{% url 'recipe_list' %}";
+    }
+}
+</script>
+{% endblock %}

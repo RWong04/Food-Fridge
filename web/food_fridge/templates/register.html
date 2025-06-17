@@ -46,5 +46,26 @@ document.getElementById('register-form').onsubmit = async function(e) {
         document.getElementById('register-result').innerText = JSON.stringify(data, null, 2);
     }
 };
+
+window.addEventListener('popstate', function(event) {
+    const params = new URLSearchParams(window.location.search);
+    const searchTerm = params.get('simple-search') || '';
+
+    fetch('http://localhost:16701/app/search_recipe/?simple-search=' + encodeURIComponent(searchTerm), {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        updateRecipeList(data);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        recipeList.innerHTML = '<div class="col-span-full text-center text-red-500">搜尋失敗，請稍後再試</div>';
+    });
+});
+
 </script>
 {% endblock %}
+

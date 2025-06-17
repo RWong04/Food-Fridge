@@ -40,7 +40,7 @@
                 <p>建立時間：{{ recipe.create_time|date:"Y-m-d" }}</p>
             </div>
             <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
-                <a href="/app/recipe/${recipe.id}/" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-300 rounded-lg hover:bg-red-300 focus:ring-4 focus:outline-none focus:bg-red-300 dark:bg-red-300 dark:hover:bg-red-300 dark:focus:bg-red-300">
+                <a href="/app/recipe/{{ recipe.id }}/" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-300 rounded-lg hover:bg-red-300 focus:ring-4 focus:outline-none focus:bg-red-300 dark:bg-red-300 dark:hover:bg-red-300 dark:focus:bg-red-300">
                     查看食譜
                 </a>
             </div>
@@ -54,60 +54,51 @@
 
 {% block script %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const searchForm = document.getElementById('search-food-form');
     const recipeList = document.getElementById('recipe-list');
     const searchInput = document.getElementById('simple-search');
 
-    fetch('', {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            updateRecipeList(data.recipes);
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            recipeList.innerHTML = '<div class="col-span-full text-center text-red-500">載入失敗，請重新整理頁面</div>';
-        });
+    // 檢查網址參數是否有 simple-search，有的話自動觸發搜尋
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialSearchTerm = urlParams.get('simple-search');
+    if (initialSearchTerm) {
+        searchInput.value = initialSearchTerm;
+        performSearch(initialSearchTerm); // 主動搜尋
+    }
 
-    // 處理搜尋表單提交
-    searchForm.addEventListener('submit', function(event) {
+    searchForm.addEventListener('submit', function (event) {
         event.preventDefault();
-        const searchTerm = document.getElementById('simple-search').value;
-        
-        // 更新 URL
-        if(searchTerm) {
+        const searchTerm = searchInput.value;
+
+        if (searchTerm) {
             const searchParams = new URLSearchParams(window.location.search);
             searchParams.set('simple-search', searchTerm);
-            const newUrl = 'http://localhost:16701/app/search_recipe/?' + searchParams.toString();
+            const newUrl = '/app/search_recipe/?' + searchParams.toString();
+            window.history.pushState({ path: newUrl }, '', newUrl);
+        } else {
+            const newUrl = `/app/recipe_list/`;
             window.history.pushState({ path: newUrl }, '', newUrl);
         }
-        else {
-            const newUrl = `http://localhost:16701/app/recipe_list/`;
-            window.history.pushState({ path: newUrl }, '', newUrl);
-        }
-        // 'http://localhost:16701/app/search_recipe/?simple-search=' + encodeURIComponent(searchTerm)
-        // 發送搜尋 API 請求
-        fetch('http://localhost:16701/app/search_recipe/?simple-search=' + encodeURIComponent(searchTerm), {
+
+        performSearch(searchTerm); // 按下搜尋時也觸發
+    });
+
+    function performSearch(term) {
+        fetch(`/app/search_recipe/?simple-search=${encodeURIComponent(term)}`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
             }
         })
         .then(response => response.json())
-        .then(data => {
-            updateRecipeList(data);
-        })
+        .then(data => updateRecipeList(data))
         .catch(error => {
             console.error('Error:', error);
             recipeList.innerHTML = '<div class="col-span-full text-center text-red-500">搜尋失敗，請稍後再試</div>';
         });
-    });
+    }
 
-    // 更新食譜列表的共用函數
     function updateRecipeList(recipes) {
         if (!recipes || recipes.length === 0) {
             recipeList.innerHTML = '<div class="col-span-full text-center text-gray-500">沒有找到相關的食譜</div>';
@@ -126,14 +117,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p>建立時間：${recipe.create_time.split(' ')[0]}</p>
                 </div>
                 <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
-                    <a href="/app/recipe/${recipe.id}/" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-300 rounded-lg hover:bg-red-300 focus:ring-4 focus:outline-none focus:bg-red-300 dark:bg-red-300 dark:hover:bg-red-300 dark:focus:bg-red-300">
+                    <a href="/app/recipe/${recipe.id}/" class="recipe-link inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-300 rounded-lg hover:bg-red-300 focus:ring-4 focus:outline-none focus:bg-red-300 dark:bg-red-300 dark:hover:bg-red-300 dark:focus:bg-red-300">
                         查看食譜
                     </a>
                 </div>
             </div>
         `).join('');
-
     }
+
+    // 儲存返回用的連結
+    document.addEventListener('click', function(e) {
+        const anchor = e.target.closest('a[href^="/app/recipe/"]');
+        if (anchor) {
+            sessionStorage.setItem('last_page', window.location.href);
+        }
+    });
+
 });
+
+
 </script>
 {% endblock %}
