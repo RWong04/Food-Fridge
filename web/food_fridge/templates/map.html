@@ -101,7 +101,7 @@
 
             // initial
             window.addEventListener('DOMContentLoaded', () => {
-                fetch('/api/search/')
+                fetch('api/search/')
                 .then(response => {
                     if (!response.ok) throw new Error('Network response was not ok');
                     return response.json();
@@ -147,7 +147,7 @@
                 const searchTerm = searchInput.value;  // get keyword from input
                 //alert(`Searching for: ${searchTerm}`);
     
-                fetch(`/api/search/?simple-search=${encodeURIComponent(searchTerm)}`)
+                fetch('http://localhost:16701/app/map/api/search/?simple-search=' + encodeURIComponent(searchTerm))
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Network response was not ok');
@@ -158,7 +158,7 @@
                         //  show info window
                         needToOpenInfoWindow = true; // Set the flag to true to allow opening the info window again
                         displaySearchResults(data);
-                        history.pushState(null, '', `/api/search/?simple-search=${encodeURIComponent(searchTerm)}`);
+                        history.pushState(null, '', 'http://localhost:16701/app/map/api/search/?simple-search=' + encodeURIComponent(searchTerm));
                     })
                     .catch(error => {
                         console.error('There was a problem with the fetch operation:', error);
