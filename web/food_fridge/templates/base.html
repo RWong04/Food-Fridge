@@ -116,13 +116,17 @@
 
 <script>
 function goToRecipe() {
+    const valid = sessionStorage.getItem('recipe_detail_valid');
     const last = sessionStorage.getItem('last_recipe_detail');
-    if (last) {
+
+    if (valid === 'true' && last) {
         window.location.href = last;
+        sessionStorage.removeItem('recipe_detail_valid');
     } else {
         window.location.href = "{% url 'recipe_list' %}";
     }
 }
 </script>
+
 
 </html>
