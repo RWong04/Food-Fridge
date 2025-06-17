@@ -63,7 +63,7 @@
                             <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
                         </svg>
                     </div>
-                    <input id="datepicker-actions" datepicker datepicker-format="yyyy-mm-dd" datepicker-buttons datepicker-autoselect-today type="text" name="food_expired_date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="YYYY-MM-DD" required/>
+                    <input id="datepicker-actions" data-datepicker datepicker datepicker-format="yyyy-mm-dd" datepicker-buttons datepicker-autoselect-today type="text" name="food_expired_date" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block ps-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="YYYY-MM-DD" required/>
                 </div>
             </div>
 
@@ -127,6 +127,85 @@
     </script>
 
     <script>
+        // 日期選擇器選擇完日期後自動隱藏
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateInput = document.getElementById('datepicker-actions');
+            
+            // 使用事件委託監聽所有點擊事件
+            document.addEventListener('click', function(e) {
+                // 檢查是否點擊了日期選擇器中的日期
+                if (e.target.closest('[data-date]') || 
+                    e.target.matches('[data-date]') ||
+                    e.target.textContent.match(/^\d{1,2}$/) && e.target.closest('.datepicker')) {
+                    
+                    // 延遲執行以確保日期被選中
+                    setTimeout(function() {
+                        // 嘗試多種方法隱藏日期選擇器
+                        
+                        // 方法1: 通過 Flowbite API
+                        try {
+                            const datepickerInstance = window.Datepicker?.getInstance?.(dateInput);
+                            if (datepickerInstance) {
+                                datepickerInstance.hide();
+                            }
+                        } catch(e) {}
+                        
+                        // 方法2: 直接隱藏日期選擇器元素
+                        const datepickers = document.querySelectorAll('.datepicker, [role="dialog"]');
+                        datepickers.forEach(dp => {
+                            if (dp.style) {
+                                dp.style.display = 'none';
+                                dp.style.visibility = 'hidden';
+                                dp.style.opacity = '0';
+                            }
+                        });
+                        
+                        // 方法3: 移除 show 類別
+                        const showElements = document.querySelectorAll('.datepicker.show, .datepicker-dropdown.show');
+                        showElements.forEach(el => {
+                            el.classList.remove('show');
+                            el.style.display = 'none';
+                        });
+                        
+                        // 方法4: 點擊外部區域
+                        const outsideElement = document.querySelector('body');
+                        if (outsideElement) {
+                            outsideElement.click();
+                        }
+                        
+                        // 移除輸入框焦點
+                        dateInput.blur();
+                        
+                    }, 100);
+                }
+            });
+            
+            // 備用方案：監聽輸入框值變化
+            let previousValue = dateInput.value;
+            setInterval(function() {
+                if (dateInput.value !== previousValue && dateInput.value.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    previousValue = dateInput.value;
+                    
+                    // 隱藏所有可能的日期選擇器元素
+                    setTimeout(function() {
+                        const allDatepickers = document.querySelectorAll(
+                            '.datepicker, .datepicker-dropdown, [role="dialog"], .flowbite-datepicker'
+                        );
+                        allDatepickers.forEach(dp => {
+                            if (dp.style) {
+                                dp.style.display = 'none';
+                                dp.style.visibility = 'hidden';
+                            }
+                            dp.classList.remove('show', 'block');
+                            dp.classList.add('hidden');
+                        });
+                        
+                        dateInput.blur();
+                    }, 200);
+                }
+            }, 100);
+        });
+
         document.getElementById("add-food-form").addEventListener("submit", function(event) {
             event.preventDefault();  // 阻止默認表單提交行為
     

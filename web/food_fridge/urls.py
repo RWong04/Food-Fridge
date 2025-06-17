@@ -19,4 +19,10 @@ urlpatterns = [
     path('recipe_list/', views.recipe_list, name='recipe_list'),
     path('recipe/<int:recipe_id>/', views.recipe_detail, name='recipe_detail'),
     path('search_recipe/', views.search_recipe, name='search_recipe'),
+    # 聊天室
+    path('chats/', views.chat_list, name='chat_list'),
+    path('chat/<int:food_id>/', views.start_chat, name='start_chat'),
+    path('chatroom/<int:meetup_id>/', views.chat_room, name='chat_room'),
+    path('api/send_message/', views.send_message, name='send_message'),
+    path('api/messages/<int:meetup_id>/', views.get_messages, name='get_messages'),
 ]

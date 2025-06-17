@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .chat-item {
+        transition: background-color 0.2s ease;
+    }
+    .chat-item:hover {
+        background-color: #f8f9fa;
+    }
+    .unread-badge {
+        background-color: #dc3545;
+        color: white;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 50%;
+        min-width: 1.5rem;
+        text-align: center;
+    }
+    .unread-dot {
+        width: 12px;
+        height: 12px;
+        background-color: #dc3545;
+        border-radius: 50%;
+        position: absolute;
+        top: -2px;
+        right: -2px;
+        border: 2px solid white;
+    }
+    .avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    .message-preview {
+        color: #6c757d;
+        font-size: 0.9rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 200px;
+    }
+    .time-text {
+        color: #6c757d;
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
+
+{% block title %}聊天室列表{% endblock %}
+
+{% block navbar_title %}聊天室{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6 max-w-md">
+    {% if chat_rooms %}
+        <div class="bg-white rounded-lg shadow-sm">
+            {% for room in chat_rooms %}
+            <div class="chat-item border-b border-gray-200 last:border-b-0">
+                <a href="{% url 'chat_room' room.meetup.id %}" class="block p-4 no-underline text-inherit">
+                    <div class="flex items-center space-x-3">
+                        <!-- 用戶頭像 -->
+                        <div class="avatar">
+                            {% if room.other_user.avatar %}
+                                <img src="{{ room.other_user.avatar.url }}" alt="{{ room.other_user.username }}" class="w-full h-full object-cover rounded-full">
+                            {% else %}
+                                {{ room.other_user.username|first|upper }}
+                            {% endif %}
+                        </div>
+                        
+                        <!-- 聊天室信息 -->
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <h3 class="font-semibold text-gray-900 truncate">
+                                    {{ room.other_user.username }}
+                                </h3>
+                                {% if room.last_message %}
+                                    <span class="time-text">
+                                        {{ room.last_message.send_time|date:"m/d H:i" }}
+                                    </span>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="flex items-center justify-between mt-1">
+                                <div class="flex-1">
+                                    <p class="text-sm text-gray-600 mb-1">
+                                        關於：{{ room.meetup.food.name }}
+                                        {% if room.is_seller %}
+                                            <span class="text-green-600 text-xs">(賣方)</span>
+                                        {% else %}
+                                            <span class="text-blue-600 text-xs">(買方)</span>
+                                        {% endif %}
+                                    </p>
+                                    {% if room.last_message %}
+                                        <p class="message-preview">
+                                            {% if room.last_message.sender == current_user %}
+                                                <span class="text-gray-500">我：</span>
+                                            {% endif %}
+                                            {{ room.last_message.content }}
+                                        </p>
+                                    {% else %}
+                                        <p class="message-preview text-gray-400">
+                                            還沒有訊息
+                                        </p>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if room.unread_count > 0 %}
+                                    <div class="unread-badge">
+                                        {{ room.unread_count }}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- 箭頭圖標 -->
+                        <div class="text-gray-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- 空狀態 -->
+        <div class="text-center py-12">
+            <div class="text-6xl mb-4">💬</div>
+            <h3 class="text-xl font-semibold text-gray-700 mb-2">還沒有聊天室</h3>
+            <p class="text-gray-500 mb-6">開始瀏覽食物並聯絡賣家吧！</p>
+            <a href="{% url 'search_page' %}" class="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                瀏覽食物
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

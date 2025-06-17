@@ -5,7 +5,7 @@ from django.http                 import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from .models import Food
+from .models import Food, Meetup, Message
 import json
 from django.db.models            import Q
 import logging
@@ -409,3 +409,205 @@ def recipe_delete(request, pk):
         recipe = get_object_or_404(Recipe, pk=pk, user=request.user)
         recipe.delete()
     return redirect('profile')
+
+# Create your views here.
+# 簡單聊天室功能
+@login_required
+def simple_chat(request):
+    """簡單聊天室頁面"""
+    user = request.user
+    
+    # 尋找第一個食物來創建聊天室（用於測試）
+    food = Food.objects.first()
+    if not food:
+        return render(request, 'simple_chat.html', {'error': '請先添加一些食物'})
+    
+    # 尋找已存在的聊天室（不論當前用戶是買方或賣方）
+    meetup = Meetup.objects.filter(food=food).first()
+    
+    if not meetup:
+        # 如果沒有聊天室，創建一個新的
+        # 獲取所有用戶
+        all_users = CustomUser.objects.all()
+        if all_users.count() < 2:
+            return render(request, 'simple_chat.html', {'error': '需要至少兩個用戶才能聊天'})
+        
+        # 確定買方和賣方
+        if user == food.user:
+            # 當前用戶是食物擁有者，作為賣方
+            seller = user
+            buyer = CustomUser.objects.exclude(id=user.id).first()
+        else:
+            # 當前用戶不是食物擁有者，作為買方
+            buyer = user
+            seller = food.user
+        
+        meetup = Meetup.objects.create(
+            food=food,
+            buyer=buyer,
+            seller=seller
+        )
+    
+    # 獲取聊天紀錄
+    messages = meetup.messages.all().order_by('send_time')
+    
+    return render(request, 'simple_chat.html', {
+        'meetup': meetup,
+        'messages': messages,
+        'current_user': user
+    })
+
+@csrf_exempt
+@login_required  
+def send_message(request):
+    """發送訊息"""
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            meetup_id = data.get('meetup_id')
+            content = data.get('content', '').strip()
+            
+            if not content:
+                return JsonResponse({'success': False, 'error': '訊息不能為空'})
+                
+            meetup = get_object_or_404(Meetup, id=meetup_id)
+            
+            # 創建訊息
+            message = Message.objects.create(
+                meetup=meetup,
+                sender=request.user,
+                content=content
+            )
+            
+            return JsonResponse({
+                'success': True,
+                'message': {
+                    'id': message.id,
+                    'content': message.content,
+                    'sender': message.sender.username,
+                    'sender_avatar': message.sender.avatar.url if message.sender.avatar else None,
+                    'send_time': message.send_time.strftime('%H:%M'),
+                    'is_mine': message.sender == request.user
+                }
+            })
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    return JsonResponse({'success': False, 'error': '方法不允許'})
+
+@login_required
+def get_messages(request, meetup_id):
+    """獲取聊天紀錄"""
+    meetup = get_object_or_404(Meetup, id=meetup_id)
+    messages = meetup.messages.all().order_by('send_time')
+    
+    messages_data = []
+    for msg in messages:
+        messages_data.append({
+            'id': msg.id,
+            'content': msg.content,
+            'sender': msg.sender.username,
+            'sender_avatar': msg.sender.avatar.url if msg.sender.avatar else None,
+            'send_time': msg.send_time.strftime('%H:%M'),
+            'is_mine': msg.sender == request.user
+        })
+    
+    return JsonResponse({'messages': messages_data})
+
+@login_required
+def start_chat(request, food_id):
+    """開始與賣家聊天"""
+    food = get_object_or_404(Food, id=food_id)
+    current_user = request.user
+    
+    # 檢查是否為食物擁有者
+    if current_user == food.user:
+        return render(request, 'chat.html', {
+            'error': '您不能與自己聊天',
+            'meetup': None
+        })
+    
+    # 查找已存在的聊天室
+    meetup = Meetup.objects.filter(
+        food=food,
+        buyer=current_user,
+        seller=food.user
+    ).first()
+    
+    # 如果沒有聊天室，創建一個新的
+    if not meetup:
+        meetup = Meetup.objects.create(
+            food=food,
+            buyer=current_user,
+            seller=food.user
+        )
+    
+    # 獲取聊天紀錄
+    messages = meetup.messages.all().order_by('send_time')
+    
+    return render(request, 'chat.html', {
+        'meetup': meetup,
+        'messages': messages,
+        'current_user': current_user,
+        'user': current_user
+    })
+
+@login_required
+def chat_list(request):
+    """聊天室列表"""
+    current_user = request.user
+    
+    # 獲取用戶參與的所有聊天室（作為買方或賣方）
+    meetups = Meetup.objects.filter(
+        Q(buyer=current_user) | Q(seller=current_user)
+    ).select_related('food', 'buyer', 'seller').order_by('-create_time')
+    
+    # 為每個聊天室添加最後一條訊息和對方用戶信息
+    chat_rooms = []
+    for meetup in meetups:
+        # 獲取最後一條訊息
+        last_message = meetup.messages.order_by('-send_time').first()
+        
+        # 確定對方用戶
+        other_user = meetup.seller if current_user == meetup.buyer else meetup.buyer
+        
+        # 計算未讀訊息數量（簡化版本，這裡假設所有訊息都是已讀）
+        unread_count = 0
+        
+        chat_rooms.append({
+            'meetup': meetup,
+            'other_user': other_user,
+            'last_message': last_message,
+            'unread_count': unread_count,
+            'is_seller': current_user == meetup.seller
+        })
+    
+    return render(request, 'chat_list.html', {
+        'chat_rooms': chat_rooms,
+        'current_user': current_user
+    })
+
+@login_required
+def chat_room(request, meetup_id):
+    """直接進入特定聊天室"""
+    meetup = get_object_or_404(Meetup, id=meetup_id)
+    current_user = request.user
+    
+    # 檢查用戶是否有權限訪問此聊天室
+    if current_user != meetup.buyer and current_user != meetup.seller:
+        return render(request, 'chat.html', {
+            'error': '您沒有權限訪問此聊天室',
+            'meetup': None
+        })
+    
+    # 獲取聊天紀錄
+    messages = meetup.messages.all().order_by('send_time')
+    
+    return render(request, 'chat.html', {
+        'meetup': meetup,
+        'messages': messages,
+        'current_user': current_user,
+        'user': current_user
+    })
+

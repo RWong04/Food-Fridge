@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if meetup %}{{ meetup.food.name }} - 聊天室{% else %}聊天室{% endif %}</title>
+    <link href="https://fonts.googleapis.com/earlyaccess/notosanstc.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .chat-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+        }
+        /* 美化滾動條 */
+        .messages-area::-webkit-scrollbar {
+            width: 6px;
+        }
+        .messages-area::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .messages-area::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        .messages-area::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        /* 自定義顏色樣式 */
+        .bg-custom-pink {
+            background-color: #D296AA;
+        }
+        .bg-custom-pink-hover:hover {
+            background-color: #C085A0;
+        }
+        .text-custom-pink-light {
+            color: #F2E1EA;
+        }
+        .border-custom-pink:focus {
+            border-color: #D296AA;
+        }
+        .ring-custom-pink:focus {
+            --tw-ring-color: #D296AA;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+<div class="chat-container bg-white max-w-md mx-auto shadow-lg">
+    <!-- 聊天室頂部 -->
+    <div class="bg-custom-pink text-white px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <a href="{% url 'chat_list' %}" class="text-white hover:text-gray-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </a>
+            <div>
+                <h1 class="text-lg font-semibold">
+                    {% if meetup %}
+                        {{ meetup.food.name }}
+                    {% else %}
+                        聊天室
+                    {% endif %}
+                </h1>
+                {% if meetup %}
+                <p class="text-sm text-red-100">與 
+                    {% if user == meetup.buyer %}
+                        {{ meetup.seller.username }}
+                    {% else %}
+                        {{ meetup.buyer.username }}
+                    {% endif %}
+                    的對話
+                </p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="text-sm text-red-100">
+            線上
+        </div>
+    </div>
+
+    {% if error %}
+        <div class="flex-1 flex items-center justify-center p-8">
+            <div class="text-center">
+                <div class="text-6xl mb-4">😕</div>
+                <p class="text-red-500 mb-4 text-lg">{{ error }}</p>
+                <a href="/app/add_food/" class="bg-custom-pink text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors">
+                    添加食物
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <!-- 聊天消息區域 -->
+        <div id="messages-container" class="messages-area px-4 py-4 space-y-4 bg-gray-50" style="height: calc(100vh - 140px);">
+            {% for message in messages %}
+            <div class="flex {% if message.sender == current_user %}justify-end{% else %}justify-start{% endif %}">
+                <div class="max-w-xs">
+                    {% if message.sender == current_user %}
+                        <!-- 我的消息 -->
+                        <div class="bg-custom-pink text-white rounded-lg px-4 py-2 shadow-sm">
+                            <p class="text-sm">{{ message.content }}</p>
+                        </div>
+                    {% else %}
+                        <!-- 對方的消息 -->
+                        <div class="flex space-x-2">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center overflow-hidden">
+                                    {% if message.sender.avatar %}
+                                        <img src="{{ message.sender.avatar.url }}" alt="{{ message.sender.username }}" class="w-full h-full object-cover">
+                                    {% else %}
+                                        <span class="text-xs font-medium text-white">
+                                            {{ message.sender.username|first|upper }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-lg px-4 py-2 shadow-sm border">
+                                <p class="text-xs text-gray-500 mb-1">{{ message.sender.username }}</p>
+                                <p class="text-sm text-gray-900">{{ message.content }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center py-12">
+                <div class="text-4xl mb-4">💬</div>
+                <p class="text-gray-500">還沒有訊息</p>
+                <p class="text-gray-400 text-sm mt-1">開始你們的對話吧！</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- 輸入區域 -->
+        <div class="bg-white border-t px-4 py-3">
+            <form id="message-form" class="flex space-x-3 items-center">
+                {% csrf_token %}
+                <input type="hidden" id="meetup-id" value="{{ meetup.id }}">
+                
+                <div class="flex-1 relative">
+                    <input 
+                        id="message-input"
+                        type="text" 
+                        placeholder="輸入訊息..."
+                        class="w-full border border-gray-300 rounded-full px-4 py-2 pr-12 focus:outline-none focus:ring-2 focus:ring-custom-pink focus:border-transparent"
+                        maxlength="500"
+                        required
+                    >
+                </div>
+                
+                <button 
+                    type="submit"
+                    class="bg-custom-pink text-white rounded-full p-2 hover:bg-custom-pink focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 transition-colors"
+                    id="send-button"
+                >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    {% endif %}
+</div>
+
+<!-- 離開確認 -->
+<div id="typing-indicator" class="hidden px-4 py-2 text-sm text-gray-500 italic">
+    對方正在輸入...
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const messagesContainer = document.getElementById('messages-container');
+    const messageForm = document.getElementById('message-form');
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    const meetupId = document.getElementById('meetup-id')?.value;
+
+    if (!meetupId) return;
+
+    // 滾動到底部
+    function scrollToBottom() {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // 初始滾動到底部
+    scrollToBottom();
+
+    // 添加新消息到界面
+    function addMessage(message) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `flex ${message.is_mine ? 'justify-end' : 'justify-start'}`;
+        
+        if (message.is_mine) {
+            messageDiv.innerHTML = `
+                <div class="max-w-xs">
+                    <div class="bg-custom-pink text-white rounded-lg px-4 py-2 shadow-sm">
+                        <p class="text-sm">${message.content}</p>
+                    </div>
+                </div>
+            `;
+        } else {
+            messageDiv.innerHTML = `
+                                    <div class="max-w-xs">
+                        <div class="flex space-x-2">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center overflow-hidden">
+                                    ${message.sender_avatar ? 
+                                        `<img src="${message.sender_avatar}" alt="${message.sender}" class="w-full h-full object-cover">` :
+                                        `<span class="text-xs font-medium text-white">${message.sender.charAt(0).toUpperCase()}</span>`
+                                    }
+                                </div>
+                            </div>
+                        <div class="bg-white rounded-lg px-4 py-2 shadow-sm border">
+                            <p class="text-xs text-gray-500 mb-1">${message.sender}</p>
+                            <p class="text-sm text-gray-900">${message.content}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        messagesContainer.appendChild(messageDiv);
+        scrollToBottom();
+    }
+
+    // 發送消息
+    messageForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const content = messageInput.value.trim();
+        if (!content) return;
+
+        // 禁用發送按鈕
+        sendButton.disabled = true;
+        messageInput.disabled = true;
+
+        try {
+            const response = await fetch('/app/api/send_message/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify({
+                    meetup_id: parseInt(meetupId),
+                    content: content
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                addMessage(data.message);
+                messageInput.value = '';
+            } else {
+                alert('發送失敗: ' + (data.error || '未知錯誤'));
+            }
+
+        } catch (error) {
+            console.error('發送消息錯誤:', error);
+            alert('發送失敗，請稍後再試');
+        } finally {
+            // 重新啟用發送按鈕
+            sendButton.disabled = false;
+            messageInput.disabled = false;
+            messageInput.focus();
+        }
+    });
+
+    // 每3秒獲取新消息
+    setInterval(async function() {
+        try {
+            const response = await fetch(`/app/api/messages/${meetupId}/`);
+            const data = await response.json();
+            
+            if (data.messages) {
+                const currentMessagesCount = messagesContainer.children.length;
+                const newMessagesCount = data.messages.length;
+                
+                if (newMessagesCount > currentMessagesCount) {
+                    // 清空容器重新渲染所有消息
+                    messagesContainer.innerHTML = '';
+                    data.messages.forEach(addMessage);
+                }
+            }
+        } catch (error) {
+            console.error('獲取消息錯誤:', error);
+        }
+    }, 3000);
+
+    // 讓輸入框獲得焦點
+    messageInput.focus();
+
+    // Enter 發送消息
+    messageInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            messageForm.dispatchEvent(new Event('submit'));
+        }
+    });
+});
+</script>
+
+</body>
+</html> 
