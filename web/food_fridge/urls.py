@@ -16,4 +16,7 @@ urlpatterns = [
     path('add_recipe/', views.add_recipe, name='add_recipe'),
     path('recipe/<int:pk>/delete/', views.recipe_delete, name='recipe_delete'),
     path('login_alert/', views.login_alert, name='login_alert'),  # 登入提示頁面
+    path('recipe_list/', views.recipe_list, name='recipe_list'),
+    path('recipe/<int:recipe_id>/', views.recipe_detail, name='recipe_detail'),
+    path('search_recipe/', views.search_recipe, name='search_recipe'),
 ]

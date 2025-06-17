@@ -1,0 +1,39 @@
+html, body, main {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.list-container {
+    width: 100%;
+    height: calc(100vh - 64px - 64px);
+    position: absolute;
+}
+
+.content-container {
+    height: calc(100vh - 64px - 64px); /* 減去 header 和 footer 的高度 */
+    overflow-y: auto;
+    padding: 2rem;
+}
+
+#search-food-form {
+    width: 80%;
+    height: 100px;
+    position: absolute;
+    top: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    background-color: transparent;
+    z-index: 1000;
+}
+
+#recipe-list {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    padding-top: 70px;
+    align-items: flex-start;
+    overflow-y: auto
+}

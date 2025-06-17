@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'src/search_recipe.css' %}">
+{% endblock %}
+
+{% block title %}{{ recipe.name }}{% endblock %}
+{% block navbar_title %}食譜詳情{% endblock %}
+{% block main_class %}h-screen overflow-hidden{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <button onclick="window.history.back()" class="mb-6 inline-flex items-center px-3 py-2 text-sm font-medium text-white bg-red-300 rounded-lg hover:bg-red-400 focus:ring-4 focus:outline-none focus:ring-red-300">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        返回
+    </button>
+
+    <div>
+        <h1 class="text-3xl font-bold mb-4">{{ recipe.name }}</h1>
+        <div class="text-sm text-gray-500">
+            <p>作者：{{ recipe.user }}</p>
+            <p>建立時間：{{ recipe.create_time|date:"Y-m-d" }}</p>
+        </div>
+
+        <div class="mb-6 mt-8">
+            <h2 class="text-xl font-semibold mb-2">食材</h2>
+            <ul class="list-disc list-inside">
+                {% for ingredient in ingredients %}
+                <li class="text-gray-700 flex items-center justify-between mb-2">
+                    <span>{{ ingredient.ingredient.name }} {{ ingredient.quantity }}{{ ingredient.unit }}</span>
+                    <a href="/map/?search={{ ingredient.ingredient.name }}" class="inline-flex items-center px-2 py-1 text-sm font-medium text-white bg-red-300 rounded-lg hover:bg-red-400 focus:ring-4 focus:outline-none focus:ring-red-300 ml-4">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        查詢
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-2">食譜描述</h2>
+            <p class="text-gray-700">{{ recipe.description|linebreaksbr }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %} 
