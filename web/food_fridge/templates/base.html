@@ -11,10 +11,7 @@
     
     <link rel="stylesheet" href="{% static 'src/output.css' %}">
     
-<<<<<<< HEAD
     <link rel="icon" type="image/x-icon" href="{% static 'fridge.ico' %}">
-=======
->>>>>>> feature/search_recipe
     <!-- Leaflet CSS for map pages -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -30,7 +27,6 @@
             <!-- 還是這裡要放什麼剩食冰箱的logo? -->
         </div>
     </nav>
-<<<<<<< HEAD
     <main class="pt-4 {% block main_class %}{% endblock %}" style="padding-bottom: 7rem;">
         {% block content %}{% endblock %}
     </main>
@@ -40,20 +36,11 @@
         <a type="button" href="{% url 'add_recipe' %}" class="p-4 w-11/12 text-center text-lg font-bold">新增食譜</a>
     </div>
 
-=======
-    <main class="{% block main_class %}{% endblock %}">
-        {% block content %}{% endblock %}
-    </main>
->>>>>>> feature/search_recipe
     <footer class="fixed bottom-0 left-0 z-20 w-full p-4 bg-gray-200 border-t border-gray-200 rounded-4xl shadow-up-xl">
         <ul class="relative flex flex-wrap justify-around mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
             <li>
                 <!--get food by list or map-->
-<<<<<<< HEAD
                 <a href="{% url 'search_page' %}">
-=======
-                <a href="#">
->>>>>>> feature/search_recipe
                     <svg class="w-[40px] h-[40px] text-dark-theme" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                         <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M9 8h10M9 12h10M9 16h10M4.99 8H5m-.02 4h.01m0 4H5"/>
                       </svg>
@@ -88,11 +75,7 @@
                 </a>
             </li>
             <li>
-<<<<<<< HEAD
                 <a href="{% url 'profile' %}">
-=======
-                <a href="# ">
->>>>>>> feature/search_recipe
                     <!--profile-->
                     <svg class="w-[40px] h-[40px] text-dark-theme " aria-hidden="true " xmlns="http://www.w3.org/2000/svg " width="24 " height="24 " fill="currentColor " viewBox="0 0 24 24 ">
                         <path fill-rule="evenodd " d="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2 9a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1a4 4 0 0 0-4-4h-4Z " clip-rule="evenodd "/>
@@ -101,21 +84,14 @@
             </li>
         </ul>
     </footer>
-<<<<<<< HEAD
     <div id="add-backdrop" class="fixed inset-0 z-50 bg-black bg-opacity-50 hidden"></div>
 
     <button type="button" id="add" class="fixed left-1/2 bottom-4 z-30 -translate-x-1/2 text-white bg-light-theme hover:bg-dark-theme focus:ring-4 focus:outline-none focus:ring-dark-theme font-medium rounded-full text-sm p-2.5 text-center shadow-lg me-2 flex items-center justify-center" onclick="">
-=======
-    
-    <button type="button " class="fixed left-1/2 bottom-4 z-30 -translate-x-1/2 text-white bg-light-theme hover:bg-dark-theme focus:ring-4 focus:outline-none focus:ring-dark-theme font-medium rounded-full text-sm p-2.5 text-center shadow-lg me-2 flex
-                items-center justify-center ">
->>>>>>> feature/search_recipe
         <svg class="w-[52px] h-[52px] text-gray-50 " aria-hidden="true " xmlns="http://www.w3.org/2000/svg " width="24 " height="24 " fill="none " viewBox="0 0 24 24 ">
             <path stroke="currentColor " stroke-linecap="round " stroke-linejoin="round " stroke-width="2 " d="M5 12h14m-7 7V5 "/>
         </svg>
         <span class="sr-only ">Icon description</span>
     </button>
-<<<<<<< HEAD
     <script>
     const addBtn = document.getElementById('add');
     const addBackdrop = document.getElementById('add-backdrop');
@@ -133,8 +109,6 @@
         addBackdrop.classList.add('hidden');
     });
     </script>
-=======
->>>>>>> feature/search_recipe
     {%block script%} {% endblock %}
 </body>
 </html>
