@@ -66,7 +66,7 @@
             </li>
             <li>
                 <!--recipe-->
-                <a href="{% url 'recipe_list' %}">
+                <a href="#" onclick="goToRecipe()">
                     <svg class="w-[40px] h-[40px] text-dark-theme " aria-hidden="true " xmlns="http://www.w3.org/2000/svg " width="24 " height="24 " fill="none " viewBox="0 0 24 24 ">
                         <path fill="currentColor " d="M15 3.00009H9.00003c-2.76143 0-5 2.23858-5 5v1c0 .55229.44771 1.00001 1 1.00001H19c.5523 0 1-.44773 1-1.00001v-1c0-2.76142-2.2386-5-5-5Z "/>
                         <path fill="currentColor " d="m4.35115 12.9364 2.31554-.8683 2.31555.8683c.22638.0849.47586.0849.70224 0L12 12.0681l2.3156.8683c.2264.0849.4758.0849.7022 0l2.3156-.8683 2.3155.8683c.5171.1939 1.0935-.0681 1.2875-.5852.1939-.5171-.0681-1.0935-.5852-1.2874l-2.6667-1c-.2264-.08493-.4759-.08493-.7023
@@ -113,4 +113,16 @@
     </script>
     {%block script%} {% endblock %}
 </body>
+
+<script>
+function goToRecipe() {
+    const last = sessionStorage.getItem('last_recipe_detail');
+    if (last) {
+        window.location.href = last;
+    } else {
+        window.location.href = "{% url 'recipe_list' %}";
+    }
+}
+</script>
+
 </html>

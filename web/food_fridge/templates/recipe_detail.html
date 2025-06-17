@@ -62,5 +62,6 @@ function goBack() {
         window.location.href = "{% url 'recipe_list' %}";
     }
 }
+sessionStorage.setItem('last_recipe_detail', window.location.href);
 </script>
 {% endblock %}
