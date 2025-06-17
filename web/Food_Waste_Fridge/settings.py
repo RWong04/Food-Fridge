@@ -93,13 +93,7 @@ DATABASES = {
     }
 }
 
-# 本地開發 SQLite 配置
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+
 AUTH_USER_MODEL = 'food_fridge.CustomUser'
 
 CSRF_TRUSTED_ORIGINS = [
