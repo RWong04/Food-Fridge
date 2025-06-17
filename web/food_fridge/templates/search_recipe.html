@@ -40,7 +40,7 @@
                 <p>建立時間：{{ recipe.create_time|date:"Y-m-d" }}</p>
             </div>
             <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
-                <a href="/recipe/${recipe.id}/" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-300 rounded-lg hover:bg-red-300 focus:ring-4 focus:outline-none focus:bg-red-300 dark:bg-red-300 dark:hover:bg-red-300 dark:focus:bg-red-300">
+                <a href="/app/recipe/${recipe.id}/" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-300 rounded-lg hover:bg-red-300 focus:ring-4 focus:outline-none focus:bg-red-300 dark:bg-red-300 dark:hover:bg-red-300 dark:focus:bg-red-300">
                     查看食譜
                 </a>
             </div>
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const recipeList = document.getElementById('recipe-list');
     const searchInput = document.getElementById('simple-search');
 
-    fetch('/recipe_list/', {
+    fetch('', {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
             }
@@ -82,16 +82,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if(searchTerm) {
             const searchParams = new URLSearchParams(window.location.search);
             searchParams.set('simple-search', searchTerm);
-            const newUrl = `/search_recipe/?${searchParams.toString()}`;
+            const newUrl = 'http://localhost:16701/app/search_recipe/?' + searchParams.toString();
             window.history.pushState({ path: newUrl }, '', newUrl);
         }
         else {
-            const newUrl = `/recipe_list/`;
+            const newUrl = `http://localhost:16701/app/recipe_list/`;
             window.history.pushState({ path: newUrl }, '', newUrl);
         }
-        
+        // 'http://localhost:16701/app/search_recipe/?simple-search=' + encodeURIComponent(searchTerm)
         // 發送搜尋 API 請求
-        fetch(`/search_recipe/?simple-search=${encodeURIComponent(searchTerm)}`, {
+        fetch('http://localhost:16701/app/search_recipe/?simple-search=' + encodeURIComponent(searchTerm), {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <p>建立時間：${recipe.create_time.split(' ')[0]}</p>
                 </div>
                 <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
-                    <a href="/recipe/${recipe.id}/" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-300 rounded-lg hover:bg-red-300 focus:ring-4 focus:outline-none focus:bg-red-300 dark:bg-red-300 dark:hover:bg-red-300 dark:focus:bg-red-300">
+                    <a href="/app/recipe/${recipe.id}/" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-300 rounded-lg hover:bg-red-300 focus:ring-4 focus:outline-none focus:bg-red-300 dark:bg-red-300 dark:hover:bg-red-300 dark:focus:bg-red-300">
                         查看食譜
                     </a>
                 </div>
