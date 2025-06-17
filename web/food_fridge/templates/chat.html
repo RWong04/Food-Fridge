@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% if meetup %}{{ meetup.food.name }} - 聊天室{% else %}聊天室{% endif %}</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'fridge.ico' %}">
     <link href="https://fonts.googleapis.com/earlyaccess/notosanstc.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
@@ -93,24 +95,24 @@
             <div class="text-center">
                 <div class="text-6xl mb-4">😕</div>
                 <p class="text-red-500 mb-4 text-lg">{{ error }}</p>
-                <a href="/app/add_food/" class="bg-custom-pink text-white px-6 py-3 rounded-lg hover:bg-red-600 transition-colors">
+                <a href="/app/add_food/" class="bg-custom-pink text-white px-6 py-3 rounded-lg hover:bg-dark-theme transition-colors">
                     添加食物
                 </a>
             </div>
         </div>
     {% else %}
-        <!-- 聊天消息區域 -->
+        <!-- 聊天訊息區域 -->
         <div id="messages-container" class="messages-area px-4 py-4 space-y-4 bg-gray-50" style="height: calc(100vh - 140px);">
             {% for message in messages %}
             <div class="flex {% if message.sender == current_user %}justify-end{% else %}justify-start{% endif %}">
                 <div class="max-w-xs">
                     {% if message.sender == current_user %}
-                        <!-- 我的消息 -->
+                        <!-- 我的訊息 -->
                         <div class="bg-custom-pink text-white rounded-lg px-4 py-2 shadow-sm">
                             <p class="text-sm">{{ message.content }}</p>
                         </div>
                     {% else %}
-                        <!-- 對方的消息 -->
+                        <!-- 對方的訊息 -->
                         <div class="flex space-x-2">
                             <div class="flex-shrink-0">
                                 <div class="w-8 h-8 rounded-full bg-gray-400 flex items-center justify-center overflow-hidden">
@@ -194,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 初始滾動到底部
     scrollToBottom();
 
-    // 添加新消息到界面
+    // 添加新訊息到界面
     function addMessage(message) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `flex ${message.is_mine ? 'justify-end' : 'justify-start'}`;
@@ -232,7 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
         scrollToBottom();
     }
 
-    // 發送消息
+    // 發送訊息
     messageForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
@@ -266,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
         } catch (error) {
-            console.error('發送消息錯誤:', error);
+            console.error('發送訊息錯誤:', error);
             alert('發送失敗，請稍後再試');
         } finally {
             // 重新啟用發送按鈕
@@ -276,7 +278,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 每3秒獲取新消息
+    // 每3秒獲取新訊息
     setInterval(async function() {
         try {
             const response = await fetch(`/app/api/messages/${meetupId}/`);
@@ -287,20 +289,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 const newMessagesCount = data.messages.length;
                 
                 if (newMessagesCount > currentMessagesCount) {
-                    // 清空容器重新渲染所有消息
+                    // 清空容器重新渲染所有訊息
                     messagesContainer.innerHTML = '';
                     data.messages.forEach(addMessage);
                 }
             }
         } catch (error) {
-            console.error('獲取消息錯誤:', error);
+            console.error('獲取訊息錯誤:', error);
         }
     }, 3000);
 
     // 讓輸入框獲得焦點
     messageInput.focus();
 
-    // Enter 發送消息
+    // Enter 發送訊息
     messageInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
