@@ -135,7 +135,7 @@ def recipe_list(request):
             'id': recipe.id,
             'name': recipe.name,
             'description': recipe.description,
-            'create_time': recipe.create_time.strftime('%Y-%m-%d %H:%M:%S'),
+            'create_time': recipe.create_time.strftime('%Y-%m-%d'),
             'user': recipe.user.username,
             'ingredients': ingredients_data
         }
@@ -174,7 +174,7 @@ def search_recipe(request):
                 'id': recipe.id,
                 'name': recipe.name,
                 'description': recipe.description,
-                'create_time': recipe.create_time.strftime('%Y-%m-%d %H:%M:%S'),
+                'create_time': recipe.create_time.strftime('%Y-%m-%d'),
                 'user': str(recipe.user),
                 'ingredients': ingredients_data
             }

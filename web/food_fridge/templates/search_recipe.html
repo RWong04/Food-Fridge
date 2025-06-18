@@ -37,7 +37,7 @@
             </div>
             <div class="text-sm text-gray-500">
                 <p>作者：{{ recipe.user }}</p>
-                {% comment %} <p>建立時間：{{ recipe.create_time|date:"Y-m-d" }}</p> {% endcomment %}
+                <p>建立時間：{{recipe.create_time}}</p>
             </div>
             <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
                 <a href="/app/recipe/{{ recipe.id }}/" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-300 rounded-lg hover:bg-red-300 focus:ring-4 focus:outline-none focus:bg-red-300 dark:bg-red-300 dark:hover:bg-red-300 dark:focus:bg-red-300">
