@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'food_fridge',
-    # 'compressor',
+    'django_seed',
 ]
 
 MIDDLEWARE = [

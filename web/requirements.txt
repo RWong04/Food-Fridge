@@ -6,3 +6,4 @@ pycryptodome
 python-dotenv
 Pillow
 django-compressor
+django-seed
